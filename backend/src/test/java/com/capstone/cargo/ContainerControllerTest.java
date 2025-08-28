@@ -88,17 +88,4 @@ public class ContainerControllerTest {
         verify(containerService, times(1)).updateContainer(1L,updatedData);
     }
 
-//    @Test
-//    public void testUpdateNotExistingContainer() throws Exception {
-//        Container updatedData = new Container(1L, "PCT", "OOCL", "MNL", "HKG");
-//        when(containerService.updateContainer(eq(3L), any()))
-//                .thenThrow(new IllegalArgumentException("ID does not exist"));
-//
-//        mockMvc.perform(put("/api/containers/3")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(updatedData)))
-//                .andExpect(status().isNotFound());
-//
-//        verify(containerService, times(1)).updateContainer(3L,updatedData);
-//    }
 }
