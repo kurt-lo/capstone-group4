@@ -1,29 +1,49 @@
 package com.capstone.cargo.controller;
 
+
+import com.capstone.cargo.dto.JwtResponseDto;
+import com.capstone.cargo.dto.UserLoginDto;
 import com.capstone.cargo.dto.UserRegistrationDto;
+import com.capstone.cargo.model.User;
 import com.capstone.cargo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/user")
-@CrossOrigin(origins = "http://localhost:5173")
+@Slf4j
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @GetMapping("/hello")
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("hello")
     public ResponseEntity<String> hello() {
-        return new ResponseEntity<>("Hello World!", HttpStatus.OK);
+        return ResponseEntity.ok("Hello, User!");
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserRegistrationDto> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) {
-        userService.registerUser(userRegistrationDto);
-        return new ResponseEntity<>(userRegistrationDto, HttpStatus.OK);
+    public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) {
+        String response = userService.registerUser(userRegistrationDto);
+        return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponseDto> loginUser(@RequestBody UserLoginDto userLoginDto) {
+        JwtResponseDto jwtResponseDto = userService.loginUser(userLoginDto);
+        log.info("User logged in successfully: {}", userLoginDto.getUsername());
+        return ResponseEntity.ok(jwtResponseDto);
+    }
 }

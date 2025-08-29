@@ -13,6 +13,7 @@ public class UserRegistrationDto {
     private String firstName;
     private String lastName;
     private String emailAddress;
+    private String userRole;
     private String companyName;
     private String username;
     private String password;

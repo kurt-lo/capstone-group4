@@ -17,8 +17,8 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("Social Media App API")
-                        .description("Swagger documentation for the Social Media App")
+                        .title("Container Management System API")
+                        .description("Swagger documentation for the Container Management System")
                         .version("v1.0"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components().addSecuritySchemes(securitySchemeName,

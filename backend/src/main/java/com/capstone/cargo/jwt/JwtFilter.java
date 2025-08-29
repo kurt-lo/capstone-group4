@@ -1,6 +1,6 @@
 package com.capstone.cargo.jwt;
 
-import com.capstone.cargo.service.CustomUserDetailsService;
+import com.capstone.cargo.service.CustomerUserDetailService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,14 +12,16 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+
 import java.io.IOException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-    private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService userDetailsService;
 
-    public JwtFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
+    private final JwtUtil jwtUtil;
+    private final CustomerUserDetailService userDetailsService;
+
+    public JwtFilter(JwtUtil jwtUtil, CustomerUserDetailService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }
@@ -30,15 +32,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
         final String header = request.getHeader("Authorization");
         String jwt = null;
-        String email = null;
+        String username = null;
 
         if (header != null && header.startsWith("Bearer ")) {
             jwt = header.split(" ")[1].trim();
-            email = jwtUtil.getEmailFromToken(jwt);
+            username = jwtUtil.getUserNameFromToken(jwt);
         }
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());

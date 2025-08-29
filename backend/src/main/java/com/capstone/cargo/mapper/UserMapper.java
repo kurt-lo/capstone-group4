@@ -12,11 +12,13 @@ public class UserMapper {
         if (registrationDto == null) return null;
 
         return User.builder()
+                .id(null)
                 .firstName(registrationDto.getFirstName())
                 .lastName(registrationDto.getLastName())
                 .companyName(registrationDto.getCompanyName())
                 .emailAddress(registrationDto.getEmailAddress())
                 .username(registrationDto.getUsername())
+                .userRole("USER")
                 .password(registrationDto.getPassword())
                 .build();
     }
