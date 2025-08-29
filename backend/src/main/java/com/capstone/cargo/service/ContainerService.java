@@ -25,6 +25,7 @@ public class ContainerService {
         Container newContainer = containerRepository.save(container);
         kafkaProducer.sendMessage(newContainer);
         return newContainer;
+        return containerRepository.save(container);
     }
 
     public Container createContainer(Container container) {
@@ -39,7 +40,6 @@ public class ContainerService {
         return containerRepository.findById(id)
                 .map(existingContainer -> {
                     existingContainer.setContainerType(updatedContainer.getContainerType());
-                    existingContainer.setOwner(updatedContainer.getOwner());
                     existingContainer.setDestination(updatedContainer.getDestination());
                     existingContainer.setOrigin(updatedContainer.getOrigin());
                     return containerRepository.save(existingContainer);
