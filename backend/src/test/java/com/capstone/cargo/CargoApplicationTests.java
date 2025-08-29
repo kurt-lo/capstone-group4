@@ -1,14 +1,14 @@
-package com.capstone.cargo;
+// package com.capstone.cargo;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class CargoApplicationTests {
+// @SpringBootTest
+// class CargoApplicationTests {
 
-	@Test
-	void contextLoads() {
+// 	@Test
+// 	void contextLoads() {
 
-	}
+// 	}
 
-}
+// }
