@@ -64,11 +64,17 @@ const Containers = () => {
   };
 
   // Filtered containers based on search term
+  // const filteredContainers = containers.filter(container =>
+  //   container.containerType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   container.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   container.destination.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
+
   const filteredContainers = containers.filter(container =>
-    container.containerType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    container.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    container.destination.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  (container.containerType ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+  (container.origin ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+  (container.destination ?? '').toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   // Initial data fetch on component mount
   useEffect(() => {
