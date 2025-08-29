@@ -67,7 +67,7 @@ public class UserService {
                     new UsernamePasswordAuthenticationToken(userLoginDto.getUsername(), userLoginDto.getPassword()));
 
             String token = jwtUtil.generateToken(authentication.getName());
-            return new JwtResponseDto(token);
+            return new JwtResponseDto(userLoginDto.getUsername(), token);
         } catch (AuthenticationException e) {
             throw new RuntimeException(e);
         }

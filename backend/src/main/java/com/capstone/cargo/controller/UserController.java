@@ -7,6 +7,7 @@ import com.capstone.cargo.dto.UserRegistrationDto;
 import com.capstone.cargo.model.User;
 import com.capstone.cargo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,19 +32,20 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) {
+        System.out.println(userRegistrationDto);
         String response = userService.registerUser(userRegistrationDto);
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> loginUser(@RequestBody UserLoginDto userLoginDto) {
         JwtResponseDto jwtResponseDto = userService.loginUser(userLoginDto);
         log.info("User logged in successfully: {}", userLoginDto.getUsername());
-        return ResponseEntity.ok(jwtResponseDto);
+        return new ResponseEntity<>(jwtResponseDto, HttpStatus.OK);
     }
 }
