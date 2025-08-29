@@ -59,8 +59,8 @@ public class SecurityConfig {
         return new WebMvcConfigurer() {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*") // or specify your frontend domain
-                        .allowedMethods("*")
+                        .allowedOrigins("http://localhost:5173") // or specify your frontend domain
+                        .allowedMethods("PUT", "GET", "POST", "DELETE")
                         .allowedHeaders("*");
             }
         };

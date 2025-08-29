@@ -21,7 +21,7 @@ public class ContainerService {
         return containerRepository.findAll();
     }
 
-    public Container addContainer(Container container) {
+    public Container publishKafkaMessage(Container container) {
         Container newContainer = containerRepository.save(container);
         kafkaProducer.sendMessage(newContainer);
         return newContainer;
