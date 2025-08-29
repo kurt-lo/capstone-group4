@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SourceType;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Data
@@ -41,9 +44,11 @@ public class User {
     @Column(name = "company_name")
     private String companyName;
 
+    @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at")
     private String createdAt;
 
+    @UpdateTimestamp(source = SourceType.DB)
     @Column(name = "updated_at")
     private String updatedAt;
 }

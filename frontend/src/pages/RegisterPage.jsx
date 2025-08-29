@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import shipImg from "../assets/ship.jpg";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function RegisterPage() {
   // useState hook to manage the form data.
@@ -17,7 +18,13 @@ function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   // useState hook to manage the form submission state.
-  const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Loading Message
+  const [loadingMessage, setLoadingMessage] = useState("");
+
+  // Password Error Message
+  const [passwordError, setPasswordError] = useState("");
 
   // Handles changes to form inputs and updates the state.
   const handleChange = (e) => {
@@ -26,53 +33,67 @@ function RegisterPage() {
       ...prevState,
       [name]: value,
     }));
-    console.log(signupData);
+  };
+
+  // Password Validation
+
+  const validatePassword = (password) => {
+    if (password.length < 8 || confirmPassword.length < 8) {
+      setPasswordError("Password must be at least 8 characters long.");
+    } else if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      setPasswordError("Password must contain at least one uppercase letter, lowercase letter and a number.");
+    } else if (password !== confirmPassword) {
+      setPasswordError("Password don't match!");
+    } 
+    return passwordError === "";
   };
 
   // Handles the form submission.
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("Submitting...");
+    setLoadingMessage("Submitting...");
+
+
     try {
       // TO DO: call axios find by email and username for validation
       // if () {
       //   toast.error('Email already exist!');
       // }
-      if (password !== confirmPassword) {
-        toast.error('Password don\'t match!');
-      }
-      if (password.length < 8 || confirmPassword.length < 8){
-        toast.error('Password needs atleast 8 characters!');
-      }
+      
+      const isValid = validatePassword(signupData.password)
+      
+      if (isValid) {
+        
+        const response = await axios.post(
+          "http://localhost:9090/api/user/register",
+          signupData,
+          { headers: { "Content-Type": "application/json" } }
+        );
 
-      const response = await axios.post(
-        "http://localhost:9090/api/user/register",
-        formData,
-        { headers: { "Content-Type": "application/json" } }
-      );
+        if (response.status === 201) {
+          setLoadingMessage("");
+          toast.success("User successfully registered!");
 
+          // Clear the form after a successful submission.
+          setSignupData({
+            firstName: "",
+            lastName: "",
+            companyName: "",
+            emailAddress: "",
+            username: "",
+            password: "",
+          });
 
-      if (response.status === 201) {
-        toast.success('User successfully registered!')
+          setConfirmPassword("");
 
-        // Clear the form after a successful submission.
-        setSignupData({
-          firstName: "",
-          lastName: "",
-          companyName: "",
-          email: "",
-          username: "",
-          password: "",
-        });
-
-        setConfirmPassword("");
-
-      } else {
-        setMessage("Error in signing up. Please try again.");
-      }
+        } else {
+          setErrorMessage("Error in signing up. Please try again.");
+        }
+        
+      } 
     } catch (error) {
       console.error("Error:", error);
-      setMessage("Network error. Could not connect to the server.");
+      setErrorMessage("Network error. Could not connect to the server.");
     }
   };
 
@@ -181,7 +202,12 @@ function RegisterPage() {
               </a>
             </p>
           </div>
-          {message && <p className="message text-red-400 py-2">{message}</p>}
+          {errorMessage && (
+            <p className="message text-red-400 py-2">{errorMessage}</p>
+          )}
+          {loadingMessage && (
+            <p className="message text-blue-400 py-2">{loadingMessage}</p>
+          )}
           <button
             type="submit"
             className="w-full my-5 py-2 bg-white hover:bg-gray-600 shadow-lg shadow-gray-500/10 hover:shadow-gray-500/100 text-gray-900 hover:text-white font-semibold rounded-lg"

@@ -6,7 +6,7 @@ import Footer from "./components/Footer";
 import ContainerDetails from "./components/ContainerDetails";
 import Containers from "./components/Containers";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPageRusselTest";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   return (
