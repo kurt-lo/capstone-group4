@@ -24,6 +24,22 @@ public class ContainerController {
         return new ResponseEntity<>(getAll, HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Container>> search(
+            @RequestParam(required = false) String containerType,
+            @RequestParam(required = false) String owner,
+            @RequestParam(required = false) String origin,
+            @RequestParam(required = false) String destination
+    ) {
+        List<Container> results = containerService.search(containerType, owner, origin, destination);
+
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(results);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<Container> addContainer(@RequestBody Container container){
         Container newContainer = containerService.addContainer(container);

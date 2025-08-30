@@ -55,6 +55,10 @@ public class ContainerService {
         return false;
     }
 
+    public List<Container> search(String containerType, String owner, String origin, String destination) {
+        return containerRepository.searchContainers(containerType, owner, origin, destination);
+    }
+
 //    public boolean  deleteContainer(Long id) {
 //        Container foundContainer = containerRepository.findById(id).orElse(null);
 //        if (foundContainer != null) {
