@@ -72,4 +72,28 @@ public class UserService {
             throw new RuntimeException(e);
         }
     }
+
+    public User getUserById(int id) {
+        return userRepository.findById(id).orElseThrow(() -> {
+            log.error("User not found with id: {}", id);
+            return new IllegalArgumentException("User not found");
+        });
+    }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> {
+            log.error("User not found with username: {}", username);
+            return new IllegalArgumentException("User not found");
+        });
+    }
+
+    //Delete User - for ADMIN use only
+    public void deleteUser(int id) {
+        if (!userRepository.existsById(id)) {
+            log.error("User deletion failed: User not found with id: {}", id);
+            throw new IllegalArgumentException("User not found");
+        }
+        userRepository.deleteById(id);
+        log.info("User deleted successfully with id: {}", id);
+    }
 }

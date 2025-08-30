@@ -1,6 +1,5 @@
 package com.capstone.cargo.controller;
 
-
 import com.capstone.cargo.dto.JwtResponseDto;
 import com.capstone.cargo.dto.UserLoginDto;
 import com.capstone.cargo.dto.UserRegistrationDto;
@@ -30,21 +29,40 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+    public ResponseEntity<?> getAllUsers() {
+        try {
+            List<User> users = userService.getAllUsers();
+
+            if (users.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch users");
+        }
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) {
         String response = userService.registerUser(userRegistrationDto);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        if (response.equals("User registered successfully!")) {
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponseDto> loginUser(@RequestBody UserLoginDto userLoginDto) {
-        JwtResponseDto jwtResponseDto = userService.loginUser(userLoginDto);
-        log.info("User logged in successfully: {}", userLoginDto.getUsername());
-        return new ResponseEntity<>(jwtResponseDto, HttpStatus.OK);
+    public ResponseEntity<?> loginUser(@RequestBody UserLoginDto userLoginDto) {
+        try {
+            JwtResponseDto jwtResponseDto = userService.loginUser(userLoginDto);
+            log.info("User logged in successfully: {}", userLoginDto.getUsername());
+            return new ResponseEntity<>(jwtResponseDto, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            log.error("Login failed: {}", e.getMessage());
+            return new ResponseEntity<>("Invalid username or password", HttpStatus.BAD_REQUEST);
+        }
     }
 }
