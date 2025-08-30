@@ -21,15 +21,12 @@ public class ContainerService {
         return containerRepository.findAll();
     }
 
-    public Container addContainer(Container container) {
-        Container newContainer = containerRepository.save(container);
-        kafkaProducer.sendMessage(newContainer);
-        return newContainer;
-        return containerRepository.save(container);
-    }
 
     public Container createContainer(Container container) {
-        return containerRepository.save(container);
+        Container newContainer = containerRepository.save(container);
+//        kafkaProducer.sendMessage(newContainer);
+        return newContainer;
+//        return containerRepository.save(container);
     }
 
     public Optional<Container> getContainerById(Long id) {
@@ -54,16 +51,4 @@ public class ContainerService {
         }
         return false;
     }
-
-//    public boolean  deleteContainer(Long id) {
-//        Container foundContainer = containerRepository.findById(id).orElse(null);
-//        if (foundContainer != null) {
-//            containerRepository.delete(foundContainer);
-//            return true;
-//        }
-//        return false;
-//    }
-
-
-
 }

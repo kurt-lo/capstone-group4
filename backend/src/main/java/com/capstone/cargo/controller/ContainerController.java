@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import com.capstone.cargo.model.Container;
 import com.capstone.cargo.service.ContainerService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping ("/api/containers")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -24,20 +26,14 @@ public class ContainerController {
         return new ResponseEntity<>(getAll, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<Container> addContainer(@RequestBody Container container){
-        Container newContainer = containerService.addContainer(container);
-        return new ResponseEntity<>(newContainer, HttpStatus.CREATED);
-    }
-
     @PostMapping("/create")
-    public ResponseEntity<Container> createContainer(@RequestBody Container container){
+    public ResponseEntity<Container> createContainer(@Valid @RequestBody Container container){
         Container newContainer = containerService.createContainer(container);
         return new ResponseEntity<>(newContainer, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Container> updateContainerItem(@PathVariable Long id, @RequestBody Container containerItem) {
+    public ResponseEntity<Container> updateContainerItem(@PathVariable Long id, @Valid @RequestBody Container containerItem) {
         Container updatedContainer = containerService.updateContainer(id, containerItem);
         return ResponseEntity.ok(updatedContainer);
     }
