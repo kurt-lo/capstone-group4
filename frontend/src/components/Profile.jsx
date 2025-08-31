@@ -37,7 +37,7 @@ const Profile = () => {
 
   return (
     <div className="h-screen w-auto bg-[#1f2024] text-white">
-      <div className="flex justify-between items-center">
+      <div className="justify-between items-center">
         <div>
           <h1 className="text-white text-3xl font-bold pt-4 pl-10">Profile Page</h1>
           <p className="text-gray-400 text-lg pl-10">This is the profile page.</p>
@@ -45,7 +45,7 @@ const Profile = () => {
 
       </div>
       <hr className="border-gray-600 m-4 border-dashed mx-auto w-[95%]" />
-      <div className="flex flex-row h-fit w-[80%] mx-auto justify-center">
+      <div className="flex flex-row w-300 mx-auto justify-center">
         <div id='Profile Pic' className="w-100 h-100 bg-[#1f2024] flex-col rounded-3xl flex items-center justify-center text-white text-2xl font-bold m-10 border-1 border-gray-600 p-4">
           <div className="w-auto text-3xl font-bold">
             <span>Pizza Cat</span>
@@ -223,5 +223,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
-
+export default Profile

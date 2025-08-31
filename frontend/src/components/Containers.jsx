@@ -173,6 +173,7 @@ const Containers = () => {
                   value={newContainer.destination}
                   onChange={handleCityChange}
                 />
+                </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600">Weight</label>
                 <input 
@@ -204,6 +205,7 @@ const Containers = () => {
               </button>
             </form>
           </div>
+          
           
           {/* Container List Section */}
           <div className="md:col-span-2 bg-white p-6 rounded-3xl shadow-2xl border-2 border-indigo-200">
