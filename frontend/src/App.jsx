@@ -7,19 +7,28 @@ import ContainerDetails from "./components/ContainerDetails";
 import Containers from "./components/Containers";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import Dashboard from "./pages/Dashboard";
+import Unauthorized from "./pages/Unauthorized";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <div className="min-h-screen">
-    <Navbar />
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/containers" element={<Containers />} />
-        <Route path="/containers/:id" element={<ContainerDetails />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/user/login" element={<LoginPage />} />
+        <Route path="/admin/login" element={<LoginPage />} />
+        <Route path="/user/register" element={<RegisterPage />} />
+        <Route path="/admin/register" element={<RegisterPage />} />
+        <Route element={<ProtectedRoute allowedRoles={["USER", "ADMIN"]} />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/containers" element={<Containers />} />
+          <Route path="/containers/:id" element={<ContainerDetails />} />
+        </Route>
       </Routes>
-    {/* <Footer /> */}
+      {/* <Footer /> */}
     </div>
   );
 }

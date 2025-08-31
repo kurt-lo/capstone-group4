@@ -1,11 +1,30 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import useAuthStore from "../authentication/useAuthStore";
 
-const Navbar = () => {
+function Navbar() {
+  const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
+
+  const handleLogout = () => {
+    logout();
+    navigate(user?.role === "ADMIN" ? "/admin/login" : "/user/login");
+  };
+
   return (
-    <div className="navbar bg-base-100 shadow-sm">
-      <a className="btn btn-ghost text-xl">Cargo</a>
-    </div>
+    <nav className="p-4 bg-gray-800 text-white flex justify-between">
+      <div>My App</div>
+      {user && (
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 px-4 py-1 rounded hover:bg-red-500"
+        >
+          Logout
+        </button>
+      )}
+    </nav>
   );
-};
+}
 
 export default Navbar;
