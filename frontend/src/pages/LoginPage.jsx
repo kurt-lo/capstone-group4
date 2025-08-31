@@ -1,37 +1,41 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
+import useAuthStore from "../authentication/useAuthStore";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-function Login() {
+function LoginPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");//setters getters
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const login = useAuthStore((state) => state.login);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-        credentials: "include"
+      const response = await axios.post('http://localhost:9090/api/user/login' ,{
+        username,
+        password
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Invalid credentials");
-      }
+      const data = await response.data;
+      const userData = data.username;
+      const authToken = data.token;
+      console.log('');
 
-      const data = await response.json();
-      console.log("Login success:", data);
+      login(userData, authToken);
+      localStorage.setItem("authUserToken", data.token);
 
-      sessionStorage.setItem("token", data.token);
-      navigate("/dashboard");
+      toast.success('Login success!');
+
+      // navigate("/dashboard");
+      
     } catch (err) {
       console.error(err);
-      alert(err.message || "Login failed");
+      toast.error('Invalid Email or Password!');
     } finally {
       setLoading(false);
     }
@@ -80,4 +84,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default LoginPage;

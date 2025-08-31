@@ -15,7 +15,9 @@ public class KafkaProducer {
     public void sendMessage(Container container) {
         kafkaTemplate.send(TOPIC, String.valueOf(container.getId()), container).whenComplete((result, e) -> {
             if (e == null) {
-                System.out.println("Message sent: " + container + " | partition=" + result.getRecordMetadata().partition() + " offset=" + result.getRecordMetadata().offset());
+                System.out.println("Message sent: " + container + " " +
+                         "| partition=" + result.getRecordMetadata().partition() +
+                         " offset=" + result.getRecordMetadata().offset());
             } else {
                 e.printStackTrace();
             }

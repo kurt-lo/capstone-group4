@@ -1,53 +1,55 @@
 package com.capstone.cargo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SourceType;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "Users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String userRole;
-
-    @NotNull(message = "First name cannot be empty")
-    private String firstName;
-
-    @NotNull(message = "Last name cannot be empty")
-    private String lastName;
-
-    @NotNull(message = "Company name cannot be empty")
-    private String companyName;
-
-    @Email
-    @NotNull(message = "Email Address cannot be empty")
-    private String email;
-
-    @NotNull(message = "Username cannot be empty")
-    @Pattern(regexp = "^[a-zA-Z0-9_]{3,}$", message = "Username must be at least 3 characters and contain only letters, numbers, or underscores.")
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-            message = "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special characters (@$!%*?&).")
-    @NotNull(message = "Password cannot be empty")
+    @Column(name = "password", nullable = false)
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @Column(name = "email_address", nullable = false)
+    private String emailAddress;
 
+    @Column(name = "user_role", nullable = false)
+    private String userRole;
+
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
+    @Column(name = "company_name")
+    private String companyName;
+
+    @CreationTimestamp(source = SourceType.DB)
+    @Column(name = "created_at")
+    private String createdAt;
+
+    @UpdateTimestamp(source = SourceType.DB)
+    @Column(name = "updated_at")
+    private String updatedAt;
 }
+

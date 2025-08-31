@@ -1,25 +1,50 @@
 package com.capstone.cargo.controller;
 
+
+import com.capstone.cargo.dto.JwtResponseDto;
+import com.capstone.cargo.dto.UserLoginDto;
+import com.capstone.cargo.dto.UserRegistrationDto;
 import com.capstone.cargo.model.User;
 import com.capstone.cargo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping("/api/user")
+@Slf4j
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<User> signupUser(@Valid @RequestBody User user) {
-        User newUser = userService.addUser(user);
-        return ResponseEntity.ok(newUser);
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
+    @GetMapping("hello")
+    public ResponseEntity<String> hello() {
+        return ResponseEntity.ok("Hello, User!");
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) {
+        String response = userService.registerUser(userRegistrationDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponseDto> loginUser(@RequestBody UserLoginDto userLoginDto) {
+        JwtResponseDto jwtResponseDto = userService.loginUser(userLoginDto);
+        log.info("User logged in successfully: {}", userLoginDto.getUsername());
+        return new ResponseEntity<>(jwtResponseDto, HttpStatus.OK);
+    }
 }

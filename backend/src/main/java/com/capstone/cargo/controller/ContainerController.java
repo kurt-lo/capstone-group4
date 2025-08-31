@@ -25,8 +25,8 @@ public class ContainerController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Container> addContainer(@RequestBody Container container){
-        Container newContainer = containerService.addContainer(container);
+    public ResponseEntity<Container> publishKafkaContainer(@RequestBody Container container){
+        Container newContainer = containerService.publishKafkaMessage(container);
         return new ResponseEntity<>(newContainer, HttpStatus.CREATED);
     }
 
