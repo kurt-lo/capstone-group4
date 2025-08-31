@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.capstone.cargo.model.Container;
@@ -17,11 +20,18 @@ public class ContainerController {
 
     @Autowired
     private ContainerService containerService;
-    
+
     @GetMapping
-    public ResponseEntity<List<Container>> getContainers(){
-        List<Container> getAll = containerService.getAll();
-        return new ResponseEntity<>(getAll, HttpStatus.OK);
+    public ResponseEntity<List<Container>> getContainers() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName(); // username from JWT
+        String role = auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse("");
+
+        List<Container> containers = containerService.getContainers(username, role);
+        return new ResponseEntity<>(containers, HttpStatus.OK);
     }
 
     @PostMapping("/add")
@@ -31,8 +41,11 @@ public class ContainerController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Container> createContainer(@RequestBody Container container){
-        Container newContainer = containerService.createContainer(container);
+    public ResponseEntity<Container> createContainer(@RequestBody Container container) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        Container newContainer = containerService.createContainer(container, username);
         return new ResponseEntity<>(newContainer, HttpStatus.CREATED);
     }
 

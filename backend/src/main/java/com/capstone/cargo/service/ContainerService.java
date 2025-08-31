@@ -17,8 +17,12 @@ public class ContainerService {
     @Autowired
     private KafkaProducer kafkaProducer;
 
-    public List <Container> getAll (){
-        return containerRepository.findAll();
+    public List<Container> getContainers(String username, String role) {
+        if ("ROLE_ADMIN".equals(role)) {
+            return containerRepository.findAll();
+        } else {
+            return containerRepository.findByOwner(username);
+        }
     }
 
     public Container publishKafkaMessage(Container container) {
@@ -27,7 +31,9 @@ public class ContainerService {
         return newContainer;
     }
 
-    public Container createContainer(Container container) {
+    // Save container and set owner automatically
+    public Container createContainer(Container container, String username) {
+        container.setOwner(username);
         return containerRepository.save(container);
     }
 

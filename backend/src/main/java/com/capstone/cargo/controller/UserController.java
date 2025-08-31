@@ -45,7 +45,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> loginUser(@RequestBody AuthLoginDto authLoginDto) {
-        JwtResponseDto jwtResponseDto = authService.login(authLoginDto);
+        JwtResponseDto jwtResponseDto = authService.login(authLoginDto, Role.USER);
         log.info("User logged in successfully: {}", authLoginDto.getUsername());
         return new ResponseEntity<>(jwtResponseDto, HttpStatus.OK);
     }
