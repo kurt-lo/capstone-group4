@@ -217,15 +217,6 @@ const Profile = () => {
               )}
             </div>
           </div>
-
-        </div>
-      </div>
-      <div id='social media' className='w-[55%] mx-auto border-gray-600 border font-normal text-white text-center mt-4 rounded-lg bg-[#1f2024]'>
-        <div className='text-md font-bold mt-2 mb-4 flex ml-4'>Socials</div>
-        <div className='flex flex-row  ml-10 space-x-10 mb-4 '>
-          <img src='https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg' alt='Facebook' className='w-8 h-8' />
-          <img src='https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg' alt='Spotify' className='w-8 h-8' />
-          <img src='https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png' alt='Instagram' className='w-8 h-8' />
         </div>
       </div>
     </div>
