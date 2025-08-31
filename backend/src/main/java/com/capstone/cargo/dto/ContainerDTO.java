@@ -19,4 +19,9 @@ public class ContainerDTO {
     private String containerSize;
     private LocalDateTime departureDate;
     private LocalDateTime arrivalDate;
+    private String createdBy;
+    private String updatedBy;
+    private LocalDateTime createDate;
+    private LocalDateTime updatedDate;
+
 }
