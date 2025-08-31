@@ -53,13 +53,11 @@ public class AuthService {
         if (userRepository.existsByUsername(authRegistrationDto.getUsername())) {
             log.error("Registration failed: Username already exists.");
             throw new ResourceAlreadyExistsException("Username already exists");
-//            return "Username already exists";
         }
 
         if (userRepository.existsByEmailAddress(authRegistrationDto.getEmailAddress())) {
             log.error("Registration failed: Email already exists.");
             throw new ResourceAlreadyExistsException("Email already exists");
-//            return "Email already exists";
         }
 
         User user = authMapper.fromRegistrationDtoToUser(authRegistrationDto, role);
@@ -71,7 +69,7 @@ public class AuthService {
         return "Created successfully!";
     }
 
-    public JwtResponseDto login(AuthLoginDto authLoginDto) {
+    public JwtResponseDto login(AuthLoginDto authLoginDto, Role expectedRole) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -84,6 +82,14 @@ public class AuthService {
 
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+
+            if (!passwordEncoder.matches(authLoginDto.getPassword(), user.getPassword())) {
+                throw new RuntimeException("Invalid password");
+            }
+
+            if (!user.getRole().equals(expectedRole)) {
+                throw new RuntimeException("Invalid role for this login endpoint");
+            }
 
             String token = jwtUtil.generateToken(
                     username,
