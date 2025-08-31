@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrackingEvent extends AbstractEntity {
+public class TrackingEvent extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,14 +28,17 @@ public class TrackingEvent extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "CONTAINER_ID", referencedColumnName = "CONTAINER_ID")
-    private Container containerId;
+    private Container container;
 
-    @Column(name = "LOCATION_ID", nullable = false, length = 20)
-    private int locationId;
+    @ManyToOne
+    @JoinColumn(name = "LOCATION_ID", referencedColumnName = "LOCATION_ID")
+    private Location location;
 
-    @Column(name = "NEXT_LOCATION_ID", nullable = false, length = 20)
-    private int nextLocationId;
+    @ManyToOne
+    @JoinColumn(name = "NEXT_LOCATION_ID", referencedColumnName = "LOCATION_ID")
+    private Location nextLocation;
 
-    @Column(name = "PREVIOUS_LOCATION_ID", nullable = false, length = 20)
-    private int previousLocationId;
+    @ManyToOne
+    @JoinColumn(name = "PREVIOUS_LOCATION_ID", referencedColumnName = "LOCATION_ID")
+    private Location previousLocation;
 }

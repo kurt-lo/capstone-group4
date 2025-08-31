@@ -11,11 +11,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location extends AbstractEntity {
+public class Location extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "LOCATION _ID")
+    @Column(name = "LOCATION_ID")
     private long locationId;
 
     @Column(name = "LOCATION_NAME", nullable = false, length = 50)
@@ -26,5 +26,5 @@ public class Location extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "CITY_ID", referencedColumnName = "CITY_ID")
-    private City cityId;
+    private City city;
 }

@@ -6,18 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class City implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class City extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +20,8 @@ public class City implements Serializable {
 
     @Column(name = "CITY_NAME", nullable = true, length = 255)
     private String cityName;
+
+    @ManyToOne
+    @JoinColumn(name = "COUNTRY_ID", referencedColumnName = "COUNTRY_ID")
+    private Country country;
 }
