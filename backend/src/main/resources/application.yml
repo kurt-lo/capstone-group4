@@ -39,5 +39,5 @@ server:
 security:
   jwt:
     secret: "b4f9e1c0d4a6e7f2a9d3b7f6c2e8a1d4f5c9b2a7e3d8f1c6b0a9d4f7e2c5b8a1"
-    ttl-ms: 3600000
+    ttl-ms: 86400000
 
