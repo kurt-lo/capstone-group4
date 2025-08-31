@@ -2,10 +2,11 @@ package com.capstone.cargo.controller;
 
 
 import com.capstone.cargo.dto.JwtResponseDto;
-import com.capstone.cargo.dto.UserLoginDto;
-import com.capstone.cargo.dto.UserRegistrationDto;
+import com.capstone.cargo.dto.AuthLoginDto;
+import com.capstone.cargo.dto.AuthRegistrationDto;
 import com.capstone.cargo.model.User;
-import com.capstone.cargo.service.UserService;
+import com.capstone.cargo.role.Role;
+import com.capstone.cargo.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,10 @@ import java.util.List;
 @Slf4j
 public class UserController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(AuthService authService) {
+        this.authService = authService;
     }
 
     @GetMapping("hello")
@@ -31,20 +32,21 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
+        List<User> users = authService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) {
-        String response = userService.registerUser(userRegistrationDto);
+    public ResponseEntity<String> registerUser(@RequestBody AuthRegistrationDto authRegistrationDto) {
+        String response = authService.register(authRegistrationDto, Role.USER);
+        log.info("User created successfully: {}", authRegistrationDto.getUsername());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponseDto> loginUser(@RequestBody UserLoginDto userLoginDto) {
-        JwtResponseDto jwtResponseDto = userService.loginUser(userLoginDto);
-        log.info("User logged in successfully: {}", userLoginDto.getUsername());
+    public ResponseEntity<JwtResponseDto> loginUser(@RequestBody AuthLoginDto authLoginDto) {
+        JwtResponseDto jwtResponseDto = authService.login(authLoginDto);
+        log.info("User logged in successfully: {}", authLoginDto.getUsername());
         return new ResponseEntity<>(jwtResponseDto, HttpStatus.OK);
     }
 }
