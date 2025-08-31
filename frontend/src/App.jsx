@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Sidebar from "./components/Sidebar";
 import Profile from "./components/Profile";
+import ReportsPage from "./components/ReportsPage";
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
       <Navbar />
       <div className="flex">
         <Sidebar />
-        <div className="flex-1">
+        <div className="w-screen" data-theme="dracula">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/containers" element={<Containers />} />
@@ -24,6 +25,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/reports" element={<ReportsPage />} />
           </Routes>
         </div>
       </div>

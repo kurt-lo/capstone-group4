@@ -55,7 +55,7 @@ const Sidebar = () => {
 
   return (
     <div 
-      className={`bg-base-200 h-screen transition-all duration-300 ease-in-out ${
+      className={`bg-base-200 h-211 transition-all duration-300 ease-in-out ${
         isHovered ? 'w-64' : 'w-16'
       } flex flex-col shadow-lg`}
       onMouseEnter={() => setIsHovered(true)}
