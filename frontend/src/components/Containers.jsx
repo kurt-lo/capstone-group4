@@ -10,13 +10,10 @@ const Containers = () => {
 
   // State for the new container form
   const [newContainer, setNewContainer] = useState({
-    containerNumber: '',
     containerType: '',
-    status: '',
     origin: '',
     destination: '',
-    weight: '',
-    containerSize: ''
+    owner: ''
   });
 
   // Fetch container data from the backend API
@@ -59,13 +56,7 @@ const Containers = () => {
       // Re-fetch containers to update the list
       await fetchContainers();
       // Reset the form
-      setNewContainer({  containerNumber: '',
-        containerType: '',
-        status: '',
-        origin: '',
-        destination: '',
-        weight: '',
-        containerSize: ''});
+      setNewContainer({ containerType: '', origin: '', destination: '', owner: '' });
     } catch (e) {
       console.error("Failed to add container:", e);
       setError("Failed to add new container. Please check the backend.");
@@ -106,33 +97,11 @@ const Containers = () => {
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600">Container Number</label>
-                <input 
-                  type="text" 
-                  name="containerNumber"
-                  value={newContainer.containerNumber}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"
-                />
-              </div>
-              <div>
                 <label className="block text-sm font-medium text-gray-600">Container Type</label>
                 <input 
                   type="text" 
                   name="containerType"
                   value={newContainer.containerType}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600">Status</label>
-                <input 
-                  type="text" 
-                  name="status"
-                  value={newContainer.status}
                   onChange={handleInputChange}
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"
@@ -148,13 +117,6 @@ const Containers = () => {
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"
                 />
-                <input
-                  list="originList"
-                  name="origin"
-                  placeholder='Enter City'
-                  value={newContainer.origin}
-                  onChange={handleInputChange}
-                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600">Destination</label>
@@ -166,30 +128,13 @@ const Containers = () => {
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"
                 />
-                <input
-                  list="destinationList"
-                  name="destination"
-                  placeholder='Enter City'
-                  value={newContainer.destination}
-                  onChange={handleCityChange}
-                />
-              <div>
-                <label className="block text-sm font-medium text-gray-600">Weight</label>
-                <input 
-                  type="text" 
-                  name="weight"
-                  value={newContainer.weight}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"
-                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Size</label>
+                <label className="block text-sm font-medium text-gray-600">Owner</label>
                 <input 
                   type="text" 
-                  name="containerSize"
-                  value={newContainer.containerSize}
+                  name="owner"
+                  value={newContainer.owner}
                   onChange={handleInputChange}
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"
