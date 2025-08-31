@@ -1,39 +1,38 @@
 package com.capstone.cargo.mapper;
 
-import com.capstone.cargo.dto.UserRegistrationDto;
+import com.capstone.cargo.dto.AuthRegistrationDto;
 import com.capstone.cargo.model.User;
+import com.capstone.cargo.role.Role;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserMapper {
+public class AuthMapper {
 
-    // DTO to Model
-    public User fromRegistrationDtoToModel(UserRegistrationDto registrationDto) {
+    // DTO to User
+    public User fromRegistrationDtoToUser(AuthRegistrationDto registrationDto, Role role) {
         if (registrationDto == null) return null;
 
         return User.builder()
-                .id(null)
                 .firstName(registrationDto.getFirstName())
                 .lastName(registrationDto.getLastName())
                 .companyName(registrationDto.getCompanyName())
                 .emailAddress(registrationDto.getEmailAddress())
                 .username(registrationDto.getUsername())
-                .userRole("USER")
+                .role(role) // fixed: match Auth base field
                 .password(registrationDto.getPassword())
                 .build();
     }
 
-    // Model to DTO
-    public UserRegistrationDto fromUserToDto(User user) {
+    // Model (User) to DTO
+    public AuthRegistrationDto fromUserToDto(User user) {
         if (user == null) return null;
 
-        return UserRegistrationDto.builder()
+        return AuthRegistrationDto.builder()
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .companyName(user.getCompanyName())
                 .emailAddress(user.getEmailAddress())
                 .username(user.getUsername())
-                .password(user.getPassword())
                 .build();
     }
 

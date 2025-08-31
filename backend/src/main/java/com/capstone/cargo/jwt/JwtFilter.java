@@ -1,6 +1,6 @@
 package com.capstone.cargo.jwt;
 
-import com.capstone.cargo.service.CustomerUserDetailService;
+import com.capstone.cargo.service.CustomUserDetailService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,9 +19,9 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final CustomerUserDetailService userDetailsService;
+    private final CustomUserDetailService userDetailsService;
 
-    public JwtFilter(JwtUtil jwtUtil, CustomerUserDetailService userDetailsService) {
+    public JwtFilter(JwtUtil jwtUtil, CustomUserDetailService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }
@@ -35,7 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String username = null;
 
         if (header != null && header.startsWith("Bearer ")) {
-            jwt = header.split(" ")[1].trim();
+            jwt = header.substring(7);
             username = jwtUtil.getUserNameFromToken(jwt);
         }
 
