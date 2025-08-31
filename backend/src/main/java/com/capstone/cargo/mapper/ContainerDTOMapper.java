@@ -14,6 +14,7 @@ public class ContainerDTOMapper {
 
     public static ContainerDTO mapContainerDTO(Container container) {
         ContainerDTO containerDTO = new ContainerDTO();
+
         containerDTO.setContainerId(container.getContainerId());
         containerDTO.setContainerType(container.getContainerType());
         containerDTO.setOrigin(container.getOrigin().getCityId());
@@ -22,13 +23,21 @@ public class ContainerDTOMapper {
         containerDTO.setContainerSize(container.getContainerSize());
         containerDTO.setDepartureDate(container.getDepartureDate());
         containerDTO.setArrivalDate(container.getArrivalDate());
+        containerDTO.setCreatedBy(container.getCreatedBy());
+        containerDTO.setUpdatedBy(container.getUpdatedBy());
+        containerDTO.setCreateDate(container.getCreateDate());
+        containerDTO.setUpdatedDate(container.getUpdatedDate());
 
         return containerDTO;
     }
 
     public static Container mapContainer(ContainerDTO containerDTO) {
         Container container = new Container();
-        container.setContainerId(containerDTO.getContainerId());
+        
+        if(containerDTO.getContainerId() != null) {
+            container.setContainerId(containerDTO.getContainerId());
+        }
+
         container.setContainerType(containerDTO.getContainerType());
         container.setOrigin(cityBuilder(containerDTO.getOrigin()));
         container.setDestination(cityBuilder(containerDTO.getDestination()));
@@ -41,7 +50,9 @@ public class ContainerDTOMapper {
     }
 
     public static Container updateContainerByDTO(Container container, ContainerDTO containerDTO) {
-        container.setContainerId(containerDTO.getContainerId());
+        if(containerDTO.getContainerId() != null) {
+            container.setContainerId(containerDTO.getContainerId());
+        }
         container.setContainerType(containerDTO.getContainerType());
         container.setOrigin(cityBuilder(containerDTO.getOrigin()));
         container.setDestination(cityBuilder(containerDTO.getDestination()));
