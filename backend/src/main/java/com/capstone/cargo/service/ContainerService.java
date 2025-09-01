@@ -1,10 +1,12 @@
 package com.capstone.cargo.service;
 
 import com.capstone.cargo.dto.ContainerDTO;
+import com.capstone.cargo.exception.ContainerNotFoundException;
 import com.capstone.cargo.mapper.ContainerDTOMapper;
 import com.capstone.cargo.model.Container;
 import com.capstone.cargo.producer.KafkaProducer;
 import com.capstone.cargo.repository.ContainerRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.Optional;
 import static com.capstone.cargo.mapper.ContainerDTOMapper.*;
 
 @Service
+@Slf4j
 public class ContainerService {
     @Autowired
     private ContainerRepository containerRepository;
@@ -33,11 +36,21 @@ public class ContainerService {
 
     public List<ContainerDTO> getAllContainers(String username, String role) {
         if ("ROLE_ADMIN".equals(role)) {
-            return containerRepository.findAll().stream()
+            List<Container> allContainers = containerRepository.findAll();
+            if (allContainers.isEmpty()) {
+                log.error("No containers found in the database");
+                throw new ContainerNotFoundException("No containers found");
+            }
+            return allContainers.stream()
                     .map(ContainerDTOMapper::mapContainerDTO)
                     .toList();
         } else {
-            return containerRepository.findByCreatedBy(username).stream()
+            List<Container> userContainers = containerRepository.findByCreatedBy(username);
+            if (userContainers.isEmpty()) {
+                log.error("No containers found for user: {}", username);
+                throw new ContainerNotFoundException("No containers found for user: " + username);
+            }
+            return userContainers.stream()
                     .map(ContainerDTOMapper::mapContainerDTO)
                     .toList();
         }
@@ -45,11 +58,16 @@ public class ContainerService {
 
     public Optional<ContainerDTO> getContainerById(Long id) {
         return containerRepository.findByContainerId(id)
-                .map(ContainerDTOMapper::mapContainerDTO);
+                .map(ContainerDTOMapper::mapContainerDTO)
+                .or(() -> {
+                    ;
+                    log.error("Container retrieval failed: Container ID: {} not found", id);
+                    throw new ContainerNotFoundException("Container ID: " + id + " not found");
+                });
     }
 
     public List<ContainerDTO> getContainersByDayRange(Long locationId, LocalDateTime startDate, LocalDateTime endDate) {
-        if(isDateRangeValid(locationId, startDate, endDate)) return Collections.emptyList();
+        if (isDateRangeValid(locationId, startDate, endDate)) return Collections.emptyList();
 
         return containerRepository.findByDate(locationId, startDate, endDate)
                 .stream().filter(Objects::nonNull)
@@ -66,18 +84,19 @@ public class ContainerService {
 
     public ContainerDTO updateContainer(Long id, ContainerDTO containerDTO) {
         Container existingContainer = containerRepository.findByContainerId(id)
-                .orElseThrow(() -> new IllegalArgumentException("ID does not exist"));
+                .orElseThrow(() -> new ContainerNotFoundException("Container ID: " + id + " not found"));
 
         Container saved = containerRepository.save(updateContainerByDTO(existingContainer, containerDTO));
         return mapContainerDTO(saved);
     }
 
-    public boolean deleteContainer(Long id) {
-        if(containerRepository.existsById(id)) {
-            containerRepository.deleteById(id);
-            return true;
+    public void deleteContainer(Long id) {
+        if (!containerRepository.existsById(id)) {
+            log.error("Container deletion failed: Container ID: {} not found", id);
+            throw new ContainerNotFoundException("Container ID: " + id + " not found");
         }
-        return false;
+        containerRepository.deleteById(id);
+        log.info("Container deletion successful: Container ID: {}", id);
     }
 
     private static boolean isDateRangeValid(Long locationId, LocalDateTime startDate, LocalDateTime endDate) {

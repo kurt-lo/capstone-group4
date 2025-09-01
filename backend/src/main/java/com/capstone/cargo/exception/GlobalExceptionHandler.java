@@ -33,4 +33,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ex.getMessage());
     }
 
+    @ExceptionHandler(ContainerNotFoundException.class)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<String> handleContainerNotFound(ContainerNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ex.getMessage());
+    }
+
 }
