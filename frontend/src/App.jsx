@@ -9,6 +9,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from "./components/Profile";
+import ReportsPage from "./pages/ReportsPage";
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/containers" element={<Containers />} />
           <Route path="/containers/:id" element={<ContainerDetails />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/reports" element={<ReportsPage />} />
         </Route>
       </Routes>
       {/* <Footer /> */}

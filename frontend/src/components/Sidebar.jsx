@@ -22,7 +22,7 @@ const Sidebar = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       ),
-      href: '/containers'
+      href: '/dashboard'
     },
     {
       name: 'Reports',
@@ -44,18 +44,13 @@ const Sidebar = () => {
     }
   ];
 
-  const handleLogout = () => {
-    // TODO: Logout logic (redirect, clear tokens etc.)
-    console.log('Logout clicked');
-  };
-
   const handleNavigation = (href) => {
     navigate(href);
   };
 
   return (
     <div 
-      className={`bg-base-200 h-screen transition-all duration-300 ease-in-out ${
+      className={`bg-[#1e2939] h-screen transition-all duration-300 ease-in-out ${
         isHovered ? 'w-64' : 'w-16'
       } flex flex-col shadow-lg`}
       onMouseEnter={() => setIsHovered(true)}
@@ -63,9 +58,9 @@ const Sidebar = () => {
     >
       <div className="flex items-center justify-center p-4 border-b border-base-300">
         {isHovered ? (
-          <h2 className="text-xl font-bold text-base-content">Menu</h2>
+          <h2 className="text-xl font-bold text-base-content text-white">Menu</h2>
         ) : (
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-[#6366f1] rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-primary-content" fill="currentColor" viewBox="0 0 24 24">
               <path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/>
             </svg>
@@ -83,39 +78,17 @@ const Sidebar = () => {
             }`}
             title={!isHovered ? item.name : ''}
           >
-            <span className="text-base-content group-hover:text-primary">
+            <span className="text-white group-hover:text-primary">
               {item.icon}
             </span>
             {isHovered && (
-              <span className="ml-3 text-base-content group-hover:text-primary font-medium">
+              <span className="ml-3 text-white group-hover:text-primary font-medium">
                 {item.name}
               </span>
             )}
           </button>
         ))}
       </nav>
-
-      <div className="border-t border-base-300 p-2">
-        <button
-          onClick={handleLogout}
-          className={`flex items-center w-full p-3 rounded-lg hover:bg-error hover:text-error-content transition-colors duration-200 group ${
-            !isHovered ? 'justify-center' : ''
-          }`}
-          title={!isHovered ? 'Logout' : ''}
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
-          {isHovered && (
-            <span className="ml-3 font-medium">Logout</span>
-          )}
-        </button>
-      </div>
     </div>
   );
 };

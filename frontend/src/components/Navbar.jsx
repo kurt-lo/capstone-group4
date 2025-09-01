@@ -13,8 +13,8 @@ function Navbar() {
   };
 
   return (
-    <nav className="p-4 bg-gray-800 text-white flex justify-between">
-      <div>My App</div>
+    <nav className="p-4 bg-gray-800 font-bold text-white flex justify-between">
+      <div>Cargo Shipping System</div>
       {user && (
         <button
           onClick={handleLogout}
