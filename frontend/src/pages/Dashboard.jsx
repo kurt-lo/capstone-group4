@@ -15,6 +15,7 @@ import {
   Bar,
   Legend,
 } from "recharts";
+import axios from "axios";
 
 function Dashboard() {
   const [containers, setContainers] = useState([]);
@@ -87,10 +88,11 @@ function Dashboard() {
         setError(null);
         setLoading(true);
 
-        const response = await fetch("http://localhost:9090/api/containers");
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const fetchContainers = await axios.get(
+          "http://localhost:9090/api/containers"
+        );
 
-        const data = await response.json();
+        const data = fetchContainers.data;
         setContainers(data);
       } catch (e) {
         console.error("Failed to fetch containers:", e);
