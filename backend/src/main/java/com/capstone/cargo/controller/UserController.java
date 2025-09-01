@@ -51,26 +51,17 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-//        User user = userService.getUserById(id);
-//        return new ResponseEntity<>(user, HttpStatus.OK);
-//    }
-
     @GetMapping("/{username}")
     public ResponseEntity<User> getUserIdByUsername(@PathVariable String username) {
         User user = userService.getUserByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        UserDTO user = userService.updateUser(id, updatedUser);
-        log.info("User updated successfully: {}", user.getFirstName());
-        return new ResponseEntity<>(user, HttpStatus.OK);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+//        UserDTO user = userService.updateUser(id, updatedUser);
+//        log.info("User updated successfully: {}", user.getFirstName());
+//        return new ResponseEntity<>(user, HttpStatus.OK);
+//    }
 
 }

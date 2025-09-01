@@ -3,6 +3,7 @@ package com.capstone.cargo.controller;
 import com.capstone.cargo.dto.AuthLoginDto;
 import com.capstone.cargo.dto.AuthRegistrationDto;
 import com.capstone.cargo.dto.JwtResponseDto;
+import com.capstone.cargo.dto.UserDTO;
 import com.capstone.cargo.exception.InvalidCredentialsException;
 import com.capstone.cargo.exception.ResourceAlreadyExistsException;
 import com.capstone.cargo.exception.ResourceNotFoundException;
@@ -51,6 +52,8 @@ class AdminControllerTest {
 
     private User user;
 
+    private UserDTO updatedUserDTO;
+
     private AuthRegistrationDto authRegistrationDto;
 
     private AuthLoginDto validAdminLoginDto, invalidAdminloginDto;
@@ -62,7 +65,7 @@ class AdminControllerTest {
     @BeforeEach
     void setUp() {
         authRegistrationDto = new AuthRegistrationDto();
-        authRegistrationDto.setEmailAddress("alexa.siri@gmail.com)");
+        authRegistrationDto.setEmailAddress("alexa.siri@gmail.com");
         authRegistrationDto.setUserRole("ADMIN");
         authRegistrationDto.setUsername("ADMIN1");
         authRegistrationDto.setPassword("ADMIN@123");
@@ -73,6 +76,14 @@ class AdminControllerTest {
         user.setPassword(authRegistrationDto.getPassword());
         user.setEmailAddress(authRegistrationDto.getEmailAddress());
         user.setRole(Role.ADMIN);
+
+        updatedUserDTO = new UserDTO(
+                "UpdatedFirstName",
+                "UpdatedLastName",
+                "alexa.siri@gmail.com",
+                "ADMIN",
+                "COSCO"
+        );
 
         validAdminLoginDto = new AuthLoginDto("ADMIN1", "ADMIN@123");
         invalidAdminloginDto = new AuthLoginDto("wrongUser", "wrongPassword");
@@ -129,7 +140,7 @@ class AdminControllerTest {
 
     @Test
     void test_givenValidAdmin_whenLogin_thenReturnJwtResponse() throws Exception {
-        when(authService.login(any(AuthLoginDto.class))).thenReturn(jwtResponseDto);
+        when(authService.login(any(AuthLoginDto.class),eq(Role.ADMIN))).thenReturn(jwtResponseDto);
 
         mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -138,12 +149,12 @@ class AdminControllerTest {
                 .andExpect(jsonPath("$.username").value("ADMIN1"))
                 .andExpect(jsonPath("$.token").value("mock-jwt-token"));
 
-        verify(authService, times(1)).login(any(AuthLoginDto.class));
+        verify(authService, times(1)).login(any(AuthLoginDto.class),eq(Role.ADMIN));
     }
 
     @Test
     void test_givenInvalidUser_whenLogin_thenThrowExceptionMessage() throws Exception {
-        when(authService.login(any(AuthLoginDto.class))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
+        when(authService.login(any(AuthLoginDto.class),eq(Role.ADMIN))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
 
         mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +163,7 @@ class AdminControllerTest {
                 .andExpect(result ->
                         assertEquals("Invalid username or password", result.getResponse().getContentAsString()));
 
-        verify(authService, times(1)).login(any(AuthLoginDto.class));
+        verify(authService, times(1)).login(any(AuthLoginDto.class),eq(Role.ADMIN));
     }
 
     @Test
@@ -236,7 +247,7 @@ class AdminControllerTest {
     @Test
     void test_givenEmptyUsername_whenLogin_thenThrowExceptionMessage() throws Exception {
 
-        when(authService.login(any(AuthLoginDto.class))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
+        when(authService.login(any(AuthLoginDto.class),eq(Role.ADMIN))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
 
         mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -244,13 +255,13 @@ class AdminControllerTest {
                 .andExpect(status().isBadRequest()).andDo(print())
                 .andExpect(result ->
                         assertEquals("Invalid username or password", result.getResponse().getContentAsString()));
-        verify(authService, times(1)).login(any(AuthLoginDto.class));
+        verify(authService, times(1)).login(any(AuthLoginDto.class),eq(Role.ADMIN));
     }
 
     @Test
     void test_givenEmptyPassword_whenLogin_thenThrowExceptionMessage() throws Exception {
 
-        when(authService.login(any(AuthLoginDto.class))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
+        when(authService.login(any(AuthLoginDto.class),eq(Role.ADMIN))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
 
         mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -258,12 +269,12 @@ class AdminControllerTest {
                 .andExpect(status().isBadRequest()).andDo(print())
                 .andExpect(result ->
                         assertEquals("Invalid username or password", result.getResponse().getContentAsString()));
-        verify(authService, times(1)).login(any(AuthLoginDto.class));
+        verify(authService, times(1)).login(any(AuthLoginDto.class),eq(Role.ADMIN));
     }
 
     @Test
     void test_givenEmptyUsernameAndPassword_whenLogin_thenThrowExceptionMessage() throws Exception {
-        when(authService.login(any(AuthLoginDto.class))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
+        when(authService.login(any(AuthLoginDto.class),eq(Role.ADMIN))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
 
         mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -271,7 +282,23 @@ class AdminControllerTest {
                 .andExpect(status().isBadRequest()).andDo(print())
                 .andExpect(result ->
                         assertEquals("Invalid username or password", result.getResponse().getContentAsString()));
-        verify(authService, times(1)).login(any(AuthLoginDto.class));
+        verify(authService, times(1)).login(any(AuthLoginDto.class),eq(Role.ADMIN));
+    }
+
+    @Test
+    void test_givenUpdatedUser_whenUpdateUser_thenReturnUpdatedUser() throws Exception {
+        when(userService.updateUser(eq(1L), any(User.class))).thenReturn(updatedUserDTO);
+
+        mockMvc.perform(put("/api/admin/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(updatedUserDTO)))
+                .andExpect(status().isOk()).andDo(print())
+                .andExpect(jsonPath("$.firstName").value("UpdatedFirstName"))
+                .andExpect(jsonPath("$.lastName").value("UpdatedLastName"))
+                .andExpect(jsonPath("$.emailAddress").value("alexa.siri@gmail.com"))
+                .andExpect(jsonPath("$.userRole").value("ADMIN"));
+
+        verify(userService, times(1)).updateUser(eq(1L), any(User.class));
     }
 
 }

@@ -3,6 +3,7 @@ package com.capstone.cargo.controller;
 import com.capstone.cargo.dto.AuthLoginDto;
 import com.capstone.cargo.dto.AuthRegistrationDto;
 import com.capstone.cargo.dto.JwtResponseDto;
+import com.capstone.cargo.dto.UserDTO;
 import com.capstone.cargo.model.User;
 import com.capstone.cargo.role.Role;
 import com.capstone.cargo.service.AuthService;
@@ -51,6 +52,13 @@ public class AdminController {
     @GetMapping("/user/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        UserDTO user = userService.updateUser(id, updatedUser);
+        log.info("User updated successfully: {}", user.getFirstName());
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 

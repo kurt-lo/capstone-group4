@@ -61,20 +61,6 @@ public class UserService {
             existingUser.setLastName(updatedUser.getLastName());
         }
 
-        if (updatedUser.getPassword() != null) {
-            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        }
-
-        if (updatedUser.getUsername() != null) {
-            if (userRepository.existsByUsername(updatedUser.getUsername())
-                    && (!existingUser.getUsername().equals(updatedUser.getUsername()))) {
-                log.error("Failed to update: Username already exists.");
-                throw new ResourceAlreadyExistsException("Username already exists");
-            }
-
-            existingUser.setUsername(updatedUser.getUsername());
-        }
-
         if (updatedUser.getEmailAddress() != null) {
             if (userRepository.existsByEmailAddress(updatedUser.getEmailAddress())
                     && (!existingUser.getEmailAddress().equals(updatedUser.getEmailAddress()))) {
@@ -84,8 +70,15 @@ public class UserService {
             existingUser.setEmailAddress(updatedUser.getEmailAddress());
         }
 
+        if (updatedUser.getRole() != null) {
+            existingUser.setRole(updatedUser.getRole());
+        }
+
+        if (updatedUser.getCompanyName() != null) {
+            existingUser.setCompanyName(updatedUser.getCompanyName());
+        }
+
         User savedUser = userRepository.save(existingUser);
-//        UserDTO userDTO = new UserDTO(savedUser.getFirstName(), savedUser.getLastName(), savedUser.getEmailAddress(), savedUser.getRole().name(), savedUser.getCompanyName());
         log.info("User updated successfully with id: {}", id);
         return new UserDTO(savedUser.getFirstName(), savedUser.getLastName(), savedUser.getEmailAddress(), savedUser.getRole().name(), savedUser.getCompanyName());
     }
