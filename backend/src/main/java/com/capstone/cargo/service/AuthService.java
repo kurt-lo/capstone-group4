@@ -3,6 +3,7 @@ package com.capstone.cargo.service;
 import com.capstone.cargo.dto.AuthLoginDto;
 import com.capstone.cargo.dto.AuthRegistrationDto;
 import com.capstone.cargo.dto.JwtResponseDto;
+import com.capstone.cargo.exception.InvalidCredentialsException;
 import com.capstone.cargo.exception.ResourceAlreadyExistsException;
 import com.capstone.cargo.jwt.JwtUtil;
 import com.capstone.cargo.mapper.AuthMapper;
@@ -18,12 +19,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Transactional
 @Slf4j
-//@RequiredArgsConstructor // used to generate a constructor with required arguments
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -44,22 +42,16 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
     public String register(AuthRegistrationDto authRegistrationDto, Role role) {
 
         if (userRepository.existsByUsername(authRegistrationDto.getUsername())) {
             log.error("Registration failed: Username already exists.");
             throw new ResourceAlreadyExistsException("Username already exists");
-//            return "Username already exists";
         }
 
         if (userRepository.existsByEmailAddress(authRegistrationDto.getEmailAddress())) {
             log.error("Registration failed: Email already exists.");
             throw new ResourceAlreadyExistsException("Email already exists");
-//            return "Email already exists";
         }
 
         User user = authMapper.fromRegistrationDtoToUser(authRegistrationDto, role);
@@ -83,7 +75,7 @@ public class AuthService {
             String username = authentication.getName();
 
             User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+                    .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));
 
             String token = jwtUtil.generateToken(
                     username,
@@ -93,7 +85,7 @@ public class AuthService {
 
             return new JwtResponseDto(username, token);
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Invalid username or password", e);
+            throw new InvalidCredentialsException("Invalid username or password", e);
         }
     }
 
