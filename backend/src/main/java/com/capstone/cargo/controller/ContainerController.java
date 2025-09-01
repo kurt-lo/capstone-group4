@@ -3,8 +3,9 @@ package com.capstone.cargo.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.capstone.cargo.Event.TrackingEventTypes;
 import com.capstone.cargo.dto.ContainerDTO;
-import com.capstone.cargo.enums.TrackingEventTypes;
+import com.capstone.cargo.model.Container;
 import jakarta.validation.Valid;
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.service.ContainerService;

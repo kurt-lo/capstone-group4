@@ -1,9 +1,9 @@
 package com.capstone.cargo.service;
 
+import com.capstone.cargo.Event.TrackingEventTypes;
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.mapper.ContainerDTOMapper;
 import com.capstone.cargo.model.Container;
-import com.capstone.cargo.enums.TrackingEventTypes;
 import com.capstone.cargo.producer.KafkaProducer;
 import com.capstone.cargo.repository.ContainerRepository;
 import org.springframework.beans.factory.annotation.Autowired;

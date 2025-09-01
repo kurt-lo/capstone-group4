@@ -1,6 +1,6 @@
 package com.capstone.cargo.model;
 
-import com.capstone.cargo.enums.TrackingEventTypes;
+import com.capstone.cargo.Event.TrackingEventTypes;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

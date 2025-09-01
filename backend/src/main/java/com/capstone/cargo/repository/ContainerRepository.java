@@ -1,7 +1,7 @@
 package com.capstone.cargo.repository;
 
+import com.capstone.cargo.Event.TrackingEventTypes;
 import com.capstone.cargo.model.Container;
-import com.capstone.cargo.enums.TrackingEventTypes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
