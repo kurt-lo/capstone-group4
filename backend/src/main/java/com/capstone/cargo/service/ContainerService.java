@@ -3,6 +3,7 @@ package com.capstone.cargo.service;
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.mapper.ContainerDTOMapper;
 import com.capstone.cargo.model.Container;
+import com.capstone.cargo.enums.TrackingEventTypes;
 import com.capstone.cargo.producer.KafkaProducer;
 import com.capstone.cargo.repository.ContainerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.capstone.cargo.mapper.ContainerDTOMapper.*;
-import static com.capstone.cargo.mapper.MapperDTOUtils.cityBuilder;
 
 @Service
 public class ContainerService {
@@ -70,4 +70,14 @@ public class ContainerService {
     private static boolean isDateRangeValid(Long locationId, LocalDateTime startDate, LocalDateTime endDate) {
         return locationId == null || startDate == null || endDate == null;
     }
+
+    public List<Container> search(
+            String containerType,
+            Long originId,
+            Long destinationId,
+            TrackingEventTypes status
+    ) {
+        return containerRepository.searchContainer(containerType, originId, destinationId, status);
+    }
+
 }

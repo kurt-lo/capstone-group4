@@ -1,8 +1,13 @@
 package com.capstone.cargo.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.capstone.cargo.dto.ContainerDTO;
+import com.capstone.cargo.enums.TrackingEventTypes;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +27,27 @@ public class ContainerController {
     public ResponseEntity<List<ContainerDTO>> getContainers(){
         List<ContainerDTO> getAll = containerService.getAllContainers();
         return new ResponseEntity<>(getAll, HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public List<Container> searchContainers(
+            @RequestParam(required = false) String containerType,
+            @RequestParam(required = false) String owner,
+            @RequestParam(required = false) Long originId,
+            @RequestParam(required = false) Long destinationId,
+            @RequestParam(required = false) String status
+    ) {
+        TrackingEventTypes trackingEventTypes = null;
+        if (status != null && !status.isEmpty()) {
+            trackingEventTypes = TrackingEventTypes.valueOf(status.toUpperCase());
+        }
+
+        return containerService.search(
+                containerType,
+                originId,
+                destinationId,
+                trackingEventTypes
+        );
     }
 
     @GetMapping("/{id}")
