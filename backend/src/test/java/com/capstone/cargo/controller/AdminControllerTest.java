@@ -26,15 +26,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest(AdminController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class UserControllerTest {
+class AdminControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -52,7 +53,7 @@ public class UserControllerTest {
 
     private AuthRegistrationDto authRegistrationDto;
 
-    private AuthLoginDto validUserLoginDto, invalidUserloginDto;
+    private AuthLoginDto validAdminLoginDto, invalidAdminloginDto;
 
     private JwtResponseDto jwtResponseDto;
 
@@ -62,30 +63,31 @@ public class UserControllerTest {
     void setUp() {
         authRegistrationDto = new AuthRegistrationDto();
         authRegistrationDto.setEmailAddress("alexa.siri@gmail.com)");
-        authRegistrationDto.setUserRole("USER");
-        authRegistrationDto.setUsername("AlexaSiri00");
-        authRegistrationDto.setPassword("Alex@Sir!123");
+        authRegistrationDto.setUserRole("ADMIN");
+        authRegistrationDto.setUsername("ADMIN1");
+        authRegistrationDto.setPassword("ADMIN@123");
 
         user = new User();
         user.setId(1L);
         user.setUsername(authRegistrationDto.getUsername());
         user.setPassword(authRegistrationDto.getPassword());
         user.setEmailAddress(authRegistrationDto.getEmailAddress());
-        user.setRole(Role.USER);
+        user.setRole(Role.ADMIN);
 
-        validUserLoginDto = new AuthLoginDto("AlexaSiri00", "Alex@Sir!123");
-        invalidUserloginDto = new AuthLoginDto("wrongUser", "wrongPassword");
-        jwtResponseDto = new JwtResponseDto("AlexaSiri00", "mock-jwt-token");
+        validAdminLoginDto = new AuthLoginDto("ADMIN1", "ADMIN@123");
+        invalidAdminloginDto = new AuthLoginDto("wrongUser", "wrongPassword");
+        jwtResponseDto = new JwtResponseDto("ADMIN1", "mock-jwt-token");
         emptyUserPassLoginDto = new AuthLoginDto("", "");
         emptyUsernameLoginDto = new AuthLoginDto("", "password");
         emptyPasswordLoginDto = new AuthLoginDto("username", "");
+
     }
 
     @Test
-    void test_givenValidUser_whenRegister_thenReturnSuccessMessage() throws Exception {
+    void test_givenValidAdmin_whenRegister_thenReturnSuccessMessage() throws Exception {
         when(authService.register(any(AuthRegistrationDto.class), eq(user.getRole()))).thenReturn("User registered successfully!");
 
-        mockMvc.perform(post("/api/user/register")
+        mockMvc.perform(post("/api/admin/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(authRegistrationDto)))
                 .andExpect(status().isCreated()).andDo(print())
@@ -96,11 +98,11 @@ public class UserControllerTest {
     }
 
     @Test
-    void test_givenUsernameExists_whenRegisterUser_thenThrowExceptionMessage() throws Exception {
+    void test_givenUsernameExists_whenRegisterAdmin_thenThrowExceptionMessage() throws Exception {
         when(authService.register(any(AuthRegistrationDto.class), eq(user.getRole())))
                 .thenThrow(new ResourceAlreadyExistsException("Username already exists"));
 
-        mockMvc.perform(post("/api/user/register")
+        mockMvc.perform(post("/api/admin/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(authRegistrationDto)))
                 .andExpect(status().isConflict()).andDo(print())
@@ -111,11 +113,11 @@ public class UserControllerTest {
     }
 
     @Test
-    void test_givenEmailExists_whenRegisterUser_thenThrowExceptionMessage() throws Exception {
+    void test_givenEmailExists_whenRegisterAdmin_thenThrowExceptionMessage() throws Exception {
         when(authService.register(any(AuthRegistrationDto.class), eq(user.getRole())))
                 .thenThrow(new ResourceAlreadyExistsException("Email already exists"));
 
-        mockMvc.perform(post("/api/user/register")
+        mockMvc.perform(post("/api/admin/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(authRegistrationDto)))
                 .andExpect(status().isConflict()).andDo(print())
@@ -126,14 +128,14 @@ public class UserControllerTest {
     }
 
     @Test
-    void test_givenValidUser_whenLogin_thenReturnJwtResponse() throws Exception {
+    void test_givenValidAdmin_whenLogin_thenReturnJwtResponse() throws Exception {
         when(authService.login(any(AuthLoginDto.class))).thenReturn(jwtResponseDto);
 
-        mockMvc.perform(post("/api/user/login")
+        mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(validUserLoginDto)))
+                        .content(new ObjectMapper().writeValueAsString(validAdminLoginDto)))
                 .andExpect(status().isOk()).andDo(print())
-                .andExpect(jsonPath("$.username").value("AlexaSiri00"))
+                .andExpect(jsonPath("$.username").value("ADMIN1"))
                 .andExpect(jsonPath("$.token").value("mock-jwt-token"));
 
         verify(authService, times(1)).login(any(AuthLoginDto.class));
@@ -143,9 +145,9 @@ public class UserControllerTest {
     void test_givenInvalidUser_whenLogin_thenThrowExceptionMessage() throws Exception {
         when(authService.login(any(AuthLoginDto.class))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
 
-        mockMvc.perform(post("/api/user/login")
+        mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(invalidUserloginDto)))
+                        .content(new ObjectMapper().writeValueAsString(invalidAdminloginDto)))
                 .andExpect(status().isBadRequest()).andDo(print())
                 .andExpect(result ->
                         assertEquals("Invalid username or password", result.getResponse().getContentAsString()));
@@ -153,21 +155,20 @@ public class UserControllerTest {
         verify(authService, times(1)).login(any(AuthLoginDto.class));
     }
 
-
     @Test
     void test_givenUsers_whenGetAllUsers_thenReturnUserList() throws Exception {
         List<User> userlist = List.of(
                 user,
-                new User(2L, "ADMIN", "John", "Doe", "P@ssw0rd", "admin@gmail.com", Role.ADMIN,
+                new User(2L, "ADMIN2", "John", "Doe", "P@ssw0rd", "admin@gmail.com", Role.ADMIN,
                         "2023-05-20 13:45:30", "2023-05-20 13:45:30", "COSCO")
         );
 
         when(userService.getAllUsers()).thenReturn(userlist);
 
-        mockMvc.perform(get("/api/user").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/admin/users").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andDo(print())
-                .andExpect(jsonPath("$[0].username").value("AlexaSiri00"))
-                .andExpect(jsonPath("$[1].username").value("ADMIN"));
+                .andExpect(jsonPath("$[0].username").value("ADMIN1"))
+                .andExpect(jsonPath("$[1].username").value("ADMIN2"));
 
         verify(userService, times(1)).getAllUsers();
     }
@@ -176,7 +177,7 @@ public class UserControllerTest {
     void test_givenNoUser_whenGetAllUsers_thenReturnNoContent() throws Exception {
         when(userService.getAllUsers()).thenThrow(new UsersNotFoundException("No users found"));
 
-        mockMvc.perform(get("/api/user").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/admin/users").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent()).andDo(print())
                 .andExpect(result ->
                         assertEquals("No users found", result.getResponse().getContentAsString()));
@@ -189,9 +190,9 @@ public class UserControllerTest {
     void test_givenUser_whenGetUserById_thenReturnUser() throws Exception {
         when(userService.getUserById(1L)).thenReturn(user);
 
-        mockMvc.perform(get("/api/user/1").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/admin/user/1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andDo(print())
-                .andExpect(jsonPath("$.username").value("AlexaSiri00"));
+                .andExpect(jsonPath("$.username").value("ADMIN1"));
 
         verify(userService, times(1)).getUserById(1L);
     }
@@ -200,7 +201,7 @@ public class UserControllerTest {
     void test_givenNoUser_whenGetUserById_thenReturnNotFound() throws Exception {
         when(userService.getUserById(2L)).thenThrow(new ResourceNotFoundException("User not found"));
 
-        mockMvc.perform(get("/api/user/2").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/admin/user/2").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound()).andDo(print())
                 .andExpect(result ->
                         assertEquals("User not found", result.getResponse().getContentAsString()));
@@ -209,63 +210,27 @@ public class UserControllerTest {
     }
 
     @Test
-    void test_givenUpdatedUser_whenUpdateUser_thenReturnUpdatedUser() throws Exception {
-        User updatedUser = new User();
-        updatedUser.setFirstName("UpdatedFirstName");
-        updatedUser.setLastName("UpdatedLastName");
+    void test_givenUser_whenDeleteUser_thenReturnSuccessMessage() throws Exception {
+        doNothing().when(userService).deleteUser(1L);
 
-        User returnedUser = new User();
-        returnedUser.setFirstName(updatedUser.getFirstName());
-        returnedUser.setLastName(updatedUser.getLastName());
-        returnedUser.setUpdatedAt("2025-09-01 12:59:59");
-
-        when(userService.updateUser(eq(1L), any(User.class))).thenReturn(returnedUser);
-
-        mockMvc.perform(put("/api/user/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(updatedUser)))
+        mockMvc.perform(delete("/api/admin/user/1"))
                 .andExpect(status().isOk()).andDo(print())
-                .andExpect(jsonPath("$.firstName").value("UpdatedFirstName"))
-                .andExpect(jsonPath("$.lastName").value("UpdatedLastName"))
-                .andExpect(jsonPath("$.updatedAt").value("2025-09-01 12:59:59"));
+                .andExpect(result ->
+                        assertEquals("User deleted successfully", result.getResponse().getContentAsString()));
 
-        verify(userService, times(1)).updateUser(eq(1L), any(User.class));
+        verify(userService, times(1)).deleteUser(1L);
     }
 
     @Test
-    void test_givenExistingUsername_whenUpdateUser_thenReturnConflict() throws Exception {
-        User updatedUser = new User();
-        updatedUser.setUsername("duplicateUsername");
+    void test_givenNoUser_whenDeleteUser_thenReturnNotFound() throws Exception {
+        doThrow(new ResourceNotFoundException("User not found")).when(userService).deleteUser(2L);
 
-        when(userService.updateUser(eq(1L), any(User.class)))
-                .thenThrow(new ResourceAlreadyExistsException("Username already exists"));
-
-        mockMvc.perform(put("/api/user/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(updatedUser)))
-                .andExpect(status().isConflict()).andDo(print())
+        mockMvc.perform(delete("/api/admin/user/2"))
+                .andExpect(status().isNotFound()).andDo(print())
                 .andExpect(result ->
-                        assertEquals("Username already exists", result.getResponse().getContentAsString()));
+                        assertEquals("User not found", result.getResponse().getContentAsString()));
 
-        verify(userService, times(1)).updateUser(eq(1L), any(User.class));
-    }
-
-    @Test
-    void test_givenExistingEmail_whenUpdateUser_thenReturnConflict() throws Exception {
-        User updatedUser = new User();
-        updatedUser.setEmailAddress("duplicate@email.com");
-
-        when(userService.updateUser(eq(1L), any(User.class)))
-                .thenThrow(new ResourceAlreadyExistsException("Email already exists"));
-
-        mockMvc.perform(put("/api/user/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(updatedUser)))
-                .andExpect(status().isConflict()).andDo(print())
-                .andExpect(result ->
-                        assertEquals("Email already exists", result.getResponse().getContentAsString()));
-
-        verify(userService, times(1)).updateUser(eq(1L), any(User.class));
+        verify(userService, times(1)).deleteUser(2L);
     }
 
     @Test
@@ -273,7 +238,7 @@ public class UserControllerTest {
 
         when(authService.login(any(AuthLoginDto.class))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
 
-        mockMvc.perform(post("/api/user/login")
+        mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(emptyUsernameLoginDto)))
                 .andExpect(status().isBadRequest()).andDo(print())
@@ -287,7 +252,7 @@ public class UserControllerTest {
 
         when(authService.login(any(AuthLoginDto.class))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
 
-        mockMvc.perform(post("/api/user/login")
+        mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(emptyPasswordLoginDto)))
                 .andExpect(status().isBadRequest()).andDo(print())
@@ -300,7 +265,7 @@ public class UserControllerTest {
     void test_givenEmptyUsernameAndPassword_whenLogin_thenThrowExceptionMessage() throws Exception {
         when(authService.login(any(AuthLoginDto.class))).thenThrow(new InvalidCredentialsException("Invalid username or password"));
 
-        mockMvc.perform(post("/api/user/login")
+        mockMvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(emptyUserPassLoginDto)))
                 .andExpect(status().isBadRequest()).andDo(print())

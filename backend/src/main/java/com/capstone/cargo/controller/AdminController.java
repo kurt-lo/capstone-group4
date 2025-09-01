@@ -3,15 +3,16 @@ package com.capstone.cargo.controller;
 import com.capstone.cargo.dto.AuthLoginDto;
 import com.capstone.cargo.dto.AuthRegistrationDto;
 import com.capstone.cargo.dto.JwtResponseDto;
+import com.capstone.cargo.model.User;
 import com.capstone.cargo.role.Role;
 import com.capstone.cargo.service.AuthService;
+import com.capstone.cargo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -20,8 +21,11 @@ public class AdminController {
 
     private final AuthService authService;
 
-    public AdminController(AuthService authService) {
+    private final UserService userService;
+
+    public AdminController(AuthService authService, UserService userService) {
         this.authService = authService;
+        this.userService = userService;
     }
 
     @PostMapping("/register")
@@ -37,4 +41,24 @@ public class AdminController {
         log.info("Admin logged in successfully: {}", authLoginDto.getUsername());
         return new ResponseEntity<>(jwtResponseDto, HttpStatus.OK);
     }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        log.info("User deleted successfully with id: {}", id);
+        return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+    }
+    
 }
