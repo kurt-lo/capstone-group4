@@ -36,29 +36,38 @@ public class ContainerService {
 
     public List<ContainerDTO> getAllContainers(String username, String role) {
         if ("ROLE_ADMIN".equals(role)) {
-            return containerRepository.findAll().stream()
+            List<Container> allContainers = containerRepository.findAll();
+            if (allContainers.isEmpty()) {
+                log.error("No containers found in the database");
+                throw new ContainerNotFoundException("No containers found");
+            }
+            return allContainers.stream()
                     .map(ContainerDTOMapper::mapContainerDTO)
                     .toList();
         } else {
-            return containerRepository.findByCreatedBy(username).stream()
+            List<Container> userContainers = containerRepository.findByCreatedBy(username);
+            if (userContainers.isEmpty()) {
+                log.error("No containers found for user: {}", username);
+                throw new ContainerNotFoundException("No containers found for user: " + username);
+            }
+            return userContainers.stream()
                     .map(ContainerDTOMapper::mapContainerDTO)
                     .toList();
         }
     }
 
     public Optional<ContainerDTO> getContainerById(Long id) {
-//        return containerRepository.findByContainerId(id)
-//                .map(ContainerDTOMapper::mapContainerDTO);
         return containerRepository.findByContainerId(id)
                 .map(ContainerDTOMapper::mapContainerDTO)
-                .or(() -> {;
+                .or(() -> {
+                    ;
                     log.error("Container retrieval failed: Container ID: {} not found", id);
                     throw new ContainerNotFoundException("Container ID: " + id + " not found");
                 });
     }
 
     public List<ContainerDTO> getContainersByDayRange(Long locationId, LocalDateTime startDate, LocalDateTime endDate) {
-        if(isDateRangeValid(locationId, startDate, endDate)) return Collections.emptyList();
+        if (isDateRangeValid(locationId, startDate, endDate)) return Collections.emptyList();
 
         return containerRepository.findByDate(locationId, startDate, endDate)
                 .stream().filter(Objects::nonNull)
@@ -82,7 +91,7 @@ public class ContainerService {
     }
 
     public void deleteContainer(Long id) {
-        if(!containerRepository.existsById(id)) {
+        if (!containerRepository.existsById(id)) {
             log.error("Container deletion failed: Container ID: {} not found", id);
             throw new ContainerNotFoundException("Container ID: " + id + " not found");
         }
