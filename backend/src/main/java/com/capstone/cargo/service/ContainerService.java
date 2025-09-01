@@ -1,5 +1,6 @@
 package com.capstone.cargo.service;
 
+import com.capstone.cargo.Event.TrackingEventTypes;
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.mapper.ContainerDTOMapper;
 import com.capstone.cargo.model.Container;
@@ -83,4 +84,14 @@ public class ContainerService {
     private static boolean isDateRangeValid(Long locationId, LocalDateTime startDate, LocalDateTime endDate) {
         return locationId == null || startDate == null || endDate == null;
     }
+
+    public List<Container> search(
+            String containerType,
+            Long originId,
+            Long destinationId,
+            TrackingEventTypes status
+    ) {
+        return containerRepository.searchContainer(containerType, originId, destinationId, status);
+    }
+
 }

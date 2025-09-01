@@ -1,5 +1,12 @@
 package com.capstone.cargo.controller;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.capstone.cargo.Event.TrackingEventTypes;
+import com.capstone.cargo.dto.ContainerDTO;
+import com.capstone.cargo.model.Container;
+import jakarta.validation.Valid;
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.service.ContainerService;
 import jakarta.validation.Valid;
@@ -34,6 +41,27 @@ public class ContainerController {
 
         List<ContainerDTO> containers = containerService.getAllContainers(username, role);
         return new ResponseEntity<>(containers, HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public List<Container> searchContainers(
+            @RequestParam(required = false) String containerType,
+            @RequestParam(required = false) String owner,
+            @RequestParam(required = false) Long originId,
+            @RequestParam(required = false) Long destinationId,
+            @RequestParam(required = false) String status
+    ) {
+        TrackingEventTypes trackingEventTypes = null;
+        if (status != null && !status.isEmpty()) {
+            trackingEventTypes = TrackingEventTypes.valueOf(status.toUpperCase());
+        }
+
+        return containerService.search(
+                containerType,
+                originId,
+                destinationId,
+                trackingEventTypes
+        );
     }
 
     @GetMapping("/{id}")

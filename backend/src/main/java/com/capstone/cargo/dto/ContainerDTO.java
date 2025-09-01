@@ -1,5 +1,6 @@
 package com.capstone.cargo.dto;
 
+import com.capstone.cargo.Event.TrackingEventTypes;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class ContainerDTO {
     private String destination_city;
     private String destination_country;
     private BigDecimal weight;
+    private TrackingEventTypes status;
     private String containerSize;
     private LocalDateTime departureDate;
     private LocalDateTime arrivalDate;

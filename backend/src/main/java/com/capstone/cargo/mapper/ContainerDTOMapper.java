@@ -31,6 +31,7 @@ public class ContainerDTOMapper {
         containerDTO.setUpdatedBy(container.getUpdatedBy());
         containerDTO.setCreateDate(container.getCreateDate());
         containerDTO.setUpdatedDate(container.getUpdatedDate());
+        containerDTO.setStatus(container.getStatus());
 
         return containerDTO;
     }
@@ -49,6 +50,7 @@ public class ContainerDTOMapper {
         container.setContainerSize(containerDTO.getContainerSize());
         container.setDepartureDate(containerDTO.getDepartureDate());
         container.setArrivalDate(containerDTO.getArrivalDate());
+        container.setStatus(containerDTO.getStatus());
 
         return container;
     }
@@ -64,6 +66,7 @@ public class ContainerDTOMapper {
         container.setContainerSize(containerDTO.getContainerSize());
         container.setDepartureDate(containerDTO.getDepartureDate());
         container.setArrivalDate(containerDTO.getArrivalDate());
+        container.setStatus(containerDTO.getStatus());
 
         return container;
     }
