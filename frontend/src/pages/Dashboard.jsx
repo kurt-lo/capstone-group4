@@ -35,15 +35,12 @@ function Dashboard() {
     weight: "",
     containerSize: "",
     departureDate: "",
+    status: "",
     arrivalDate: "",
     createdBy: "",
   });
 
   const COLORS = ["#6366F1", "#22D3EE", "#F472B6", "#34D399"];
-
-  function getFormattedLocalDateTime(value) {
-    console.log(value);
-  }
 
   // Format date function
   function formatDate(dateString) {
@@ -415,9 +412,11 @@ function Dashboard() {
                             className="modal modal-bottom sm:modal-middle"
                           >
                             <div className="modal-box">
-                              <h3 className="font-bold text-lg text-error">Confirm Delete</h3>
+                              <h3 className="font-bold text-lg text-error">
+                                Confirm Delete
+                              </h3>
                               <p className="py-4">
-                                Are you sure you want to delete this container? 
+                                Are you sure you want to delete this container?
                               </p>
                               <div className="modal-action">
                                 <button
@@ -429,7 +428,9 @@ function Dashboard() {
                                   Confirm Delete
                                 </button>
                                 <form method="dialog">
-                                  <button className="btn btn-outline">Cancel</button>
+                                  <button className="btn btn-outline">
+                                    Cancel
+                                  </button>
                                 </form>
                               </div>
                             </div>
@@ -593,11 +594,27 @@ function Dashboard() {
                     />
                   </div>
                   <div>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleChange}
+                      className="border rounded p-2"
+                    >
+                      <option value="">-- Select Status --</option>
+                      <option value="DISCHARGED">DISCHARGED</option>
+                      <option value="VANNING">VANNING</option>
+                      <option value="IN_TRANSIT">IN_TRANSIT</option>
+                      <option value="DEVANNING">DEVANNING</option>
+                      <option value="RECEIVED">RECEIVED</option>
+                      <option value="OPEN">OPEN</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm mb-2">Departure Date</label>
                     <input
                       type="datetime-local"
                       name="departureDate"
-                      value={getFormattedLocalDateTime(formData.departureDate)}
+                      value={formData.departureDate}
                       onChange={handleChange}
                       className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
                       required
@@ -608,7 +625,7 @@ function Dashboard() {
                     <input
                       type="datetime-local"
                       name="arrivalDate"
-                      value={getFormattedLocalDateTime(formData.arrivalDate)}
+                      value={formData.arrivalDate}
                       onChange={handleChange}
                       className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
                       required
