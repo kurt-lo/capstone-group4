@@ -3,13 +3,16 @@ package com.capstone.cargo.controller;
 import com.capstone.cargo.dto.AuthLoginDto;
 import com.capstone.cargo.dto.AuthRegistrationDto;
 import com.capstone.cargo.dto.JwtResponseDto;
+import com.capstone.cargo.dto.UserDTO;
 import com.capstone.cargo.model.User;
+import com.capstone.cargo.repository.UserRepository;
 import com.capstone.cargo.role.Role;
 import com.capstone.cargo.service.AuthService;
 import com.capstone.cargo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,16 +51,25 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
+//    @GetMapping("/{id}")
+//    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+//        User user = userService.getUserById(id);
+//        return new ResponseEntity<>(user, HttpStatus.OK);
+//    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<User> getUserIdByUsername(@PathVariable String username) {
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        User user = userService.updateUser(id, updatedUser);
-        log.info("User updated successfully: {}", user.getUsername());
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        UserDTO user = userService.updateUser(id, updatedUser);
+        log.info("User updated successfully: {}", user.getFirstName());
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 

@@ -1,5 +1,6 @@
 package com.capstone.cargo.service;
 
+import com.capstone.cargo.dto.UserDTO;
 import com.capstone.cargo.exception.ResourceAlreadyExistsException;
 import com.capstone.cargo.exception.ResourceNotFoundException;
 import com.capstone.cargo.exception.UsersNotFoundException;
@@ -46,7 +47,7 @@ public class UserService {
         });
     }
 
-    public User updateUser(Long id, User updatedUser) {
+    public UserDTO updateUser(Long id, User updatedUser) {
         User existingUser = userRepository.findById(id).orElseThrow(() -> {
             log.error("User update failed: User not found with id: {}", id);
             return new ResourceNotFoundException("User not found");
@@ -84,8 +85,9 @@ public class UserService {
         }
 
         User savedUser = userRepository.save(existingUser);
+//        UserDTO userDTO = new UserDTO(savedUser.getFirstName(), savedUser.getLastName(), savedUser.getEmailAddress(), savedUser.getRole().name(), savedUser.getCompanyName());
         log.info("User updated successfully with id: {}", id);
-        return savedUser;
+        return new UserDTO(savedUser.getFirstName(), savedUser.getLastName(), savedUser.getEmailAddress(), savedUser.getRole().name(), savedUser.getCompanyName());
     }
 
     public void deleteUser(Long id) {
@@ -96,4 +98,6 @@ public class UserService {
         userRepository.deleteById(id);
         log.info("User deleted successfully with id: {}", id);
     }
+
+
 }
