@@ -40,7 +40,6 @@ function Dashboard() {
     weight: "",
     containerSize: "",
     departureDate: "",
-    status: "",
     arrivalDate: "",
     createdBy: "",
   });
@@ -174,6 +173,7 @@ function Dashboard() {
       );
 
       const data = fetchContainers.data;
+      console.log(data);
       setContainers(data);
     } catch (e) {
       console.error("Failed to fetch containers:", e);
@@ -208,7 +208,6 @@ function Dashboard() {
   }, []);
 
   // CHART DATA
-
   const containerTypes = containers.reduce((acc, c) => {
     acc[c.containerType] = (acc[c.containerType] || 0) + 1;
     return acc;
@@ -447,11 +446,11 @@ function Dashboard() {
                           {container.containerType}
                         </td>
                         <td className="p-5 border-b border-gray-700 text-white">
-                          {container.origin_city}, {container.origin_country}
+                          {container.originCity}, {container.originCountry}
                         </td>
                         <td className="p-5 border-b border-gray-700 text-white">
-                          {container.destination_city},{" "}
-                          {container.destination_country}
+                          {container.destinationCity},{" "}
+                          {container.destinationCountry}
                         </td>
                         <td className="p-5 border-b border-gray-700 text-white">
                           {container.weight}
@@ -702,22 +701,6 @@ function Dashboard() {
                       className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
                       required
                     />
-                  </div>
-                  <div>
-                    <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleChange}
-                      className="border rounded p-2"
-                    >
-                      <option value="">-- Select Status --</option>
-                      <option value="DISCHARGED">DISCHARGED</option>
-                      <option value="VANNING">VANNING</option>
-                      <option value="IN_TRANSIT">IN_TRANSIT</option>
-                      <option value="DEVANNING">DEVANNING</option>
-                      <option value="RECEIVED">RECEIVED</option>
-                      <option value="OPEN">OPEN</option>
-                    </select>
                   </div>
                   <div>
                     <label className="block text-sm mb-2">Departure Date</label>

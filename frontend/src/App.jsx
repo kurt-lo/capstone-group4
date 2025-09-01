@@ -5,9 +5,9 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ReportsPage from "./pages/ReportsPage";
 import HomePage from "./pages/HomePage";
 import Profile from "./pages/ProfilePage.jsx";
+import ReportPage from "./pages/ReportPage.jsx";
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["USER", "ADMIN"]} />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/report" element={<ReportsPage />} />
+          <Route path="/report" element={<ReportPage />} />
         </Route>
       </Routes>
       {/* <Footer /> */}
