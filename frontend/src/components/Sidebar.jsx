@@ -58,7 +58,7 @@ const Sidebar = () => {
     >
       <div className="flex items-center justify-center p-4 border-b border-base-300">
         {isHovered ? (
-          <h2 className="text-xl font-bold text-base-content text-white">Menu</h2>
+          <h2 className="text-xl font-bold text-base-content">Menu</h2>
         ) : (
           <div className="w-8 h-8 bg-[#6366f1] rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-primary-content" fill="currentColor" viewBox="0 0 24 24">
