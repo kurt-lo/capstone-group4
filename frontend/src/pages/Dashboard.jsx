@@ -28,6 +28,8 @@ function Dashboard() {
   const [selectedContainer, setSelectedContainer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [trackingEvent, setTrackingEvent] = useState([]);
+
   const token = useAuthStore((state) => state.user?.token);
 
   // Add Container
@@ -178,6 +180,25 @@ function Dashboard() {
       setError("Failed to load containers. Please check the backend.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // GET TRACKING EVENTS PER CONTAINER
+  const fetchTrackingEvents = async (id) => {
+    try {
+      console.log(id);
+      const response = await axios.get(
+        `http://localhost:9090/api/trackingEvent/container/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setTrackingEvent(response?.data);
+      console.log(response?.data);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -414,7 +435,10 @@ function Dashboard() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.4 }}
                         className="bg-gray-900/30 hover:bg-gray-800/40 transition-colors backdrop-blur-sm cursor-pointer"
-                        onClick={() => setSelectedContainer(container)}
+                        onClick={() => {
+                          setSelectedContainer(container);
+                          fetchTrackingEvents(container.containerId);
+                        }}
                       >
                         <td className="p-5 border-b border-gray-700 text-white">
                           {container.containerId}
@@ -588,7 +612,7 @@ function Dashboard() {
                 ))}
               </div>
               <div className="pt-5">
-                <ProgressBar />
+                <ProgressBar event={trackingEvent} />
               </div>
             </motion.div>
           )}

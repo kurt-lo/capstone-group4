@@ -7,7 +7,6 @@ const Home = () => {
       <Sidebar />
       <div className="text-white w-screen bg-[#0f1727]">
       <h1>Welcome Customer!</h1>
-      <Link to='/containers'>View Containers</Link>
       </div>
     </div>
   )

@@ -18,10 +18,16 @@ function Navbar() {
       <Link to={"/"}>Container Management System</Link>
       {!token && (
         <div className="flex gap-[1rem]">
-          <Link to={`/${role}/login`} className="btn btn-primary">
+          <Link
+            to={`/${role ? role : "user"}/login`}
+            className="btn btn-outline"
+          >
             Login
           </Link>
-          <Link to={`/${role}/register`} className="btn btn-outline">
+          <Link
+            to={`/${role ? role : "user"}/register`}
+            className="btn btn-outline"
+          >
             Register
           </Link>
         </div>

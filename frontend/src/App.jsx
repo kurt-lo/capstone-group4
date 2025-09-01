@@ -2,9 +2,6 @@ import { Route, Routes } from "react-router";
 import "./App.css";
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import ContainerDetails from "./components/ContainerDetails";
-import Containers from "./components/Containers";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
@@ -25,8 +22,6 @@ function App() {
         <Route path="/admin/register" element={<RegisterPage />} />
         <Route element={<ProtectedRoute allowedRoles={["USER", "ADMIN"]} />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/containers" element={<Containers />} />
-          <Route path="/containers/:id" element={<ContainerDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/reports" element={<ReportsPage />} />
         </Route>
