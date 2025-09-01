@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.capstone.cargo.mapper.ContainerDTOMapper.*;
-import static com.capstone.cargo.mapper.MapperDTOUtils.cityBuilder;
 
 @Service
 public class ContainerService {
@@ -25,10 +24,23 @@ public class ContainerService {
     @Autowired
     private KafkaProducer kafkaProducer;
 
-    public List<ContainerDTO> getAllContainers() {
-        return containerRepository.findAll().stream()
-                .map(ContainerDTOMapper::mapContainerDTO)
-                .toList();
+    public ContainerDTO publishKafkaMessage(ContainerDTO containerDTO) {
+        Container container = mapContainer(containerDTO);
+        kafkaProducer.sendMessage(container);
+        Container saved = containerRepository.save(container);
+        return mapContainerDTO(saved);
+    }
+
+    public List<ContainerDTO> getAllContainers(String username, String role) {
+        if ("ROLE_ADMIN".equals(role)) {
+            return containerRepository.findAll().stream()
+                    .map(ContainerDTOMapper::mapContainerDTO)
+                    .toList();
+        } else {
+            return containerRepository.findByCreatedBy(username).stream()
+                    .map(ContainerDTOMapper::mapContainerDTO)
+                    .toList();
+        }
     }
 
     public Optional<ContainerDTO> getContainerById(Long id) {
@@ -44,9 +56,10 @@ public class ContainerService {
                 .map(ContainerDTOMapper::mapContainerDTO)
                 .toList();
     }
-    public ContainerDTO createContainer(ContainerDTO containerDTO) {
-        Container container = mapContainer(containerDTO);
 
+    public ContainerDTO createContainer(ContainerDTO containerDTO, String username) {
+        Container container = mapContainer(containerDTO);
+        container.setCreatedBy(username);
         Container saved = containerRepository.save(container);
         return mapContainerDTO(saved);
     }
