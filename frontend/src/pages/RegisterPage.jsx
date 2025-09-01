@@ -222,7 +222,7 @@ function RegisterPage() {
 
           <button
             type="submit"
-            className="w-full my-5 py-2 bg-white hover:bg-gray-600 shadow-lg shadow-gray-500/10 hover:shadow-gray-500/100 text-gray-900 hover:text-white font-semibold rounded-lg"
+            className="w-full my-5 py-2 bg-white hover:bg-gray-600 shadow-lg shadow-gray-500/10 hover:shadow-black text-gray-900 hover:text-white font-semibold rounded-lg"
           >
             Sign Up
           </button>
