@@ -42,11 +42,6 @@ public class ContainerService {
                     .toList();
         }
     }
-    public Container addContainer(Container container) {
-        Container newContainer = containerRepository.save(container);
-        kafkaProducer.sendMessage(newContainer);
-        return newContainer;
-    }
 
     public Optional<ContainerDTO> getContainerById(Long id) {
         return containerRepository.findByContainerId(id)
@@ -61,9 +56,10 @@ public class ContainerService {
                 .map(ContainerDTOMapper::mapContainerDTO)
                 .toList();
     }
-    public ContainerDTO createContainer(ContainerDTO containerDTO) {
-        Container container = mapContainer(new Container(), containerDTO);
 
+    public ContainerDTO createContainer(ContainerDTO containerDTO, String username) {
+        Container container = mapContainer(containerDTO);
+        container.setCreatedBy(username);
         Container saved = containerRepository.save(container);
         return mapContainerDTO(saved);
     }
@@ -72,7 +68,7 @@ public class ContainerService {
         Container existingContainer = containerRepository.findByContainerId(id)
                 .orElseThrow(() -> new IllegalArgumentException("ID does not exist"));
 
-        Container saved = containerRepository.save(mapContainer(existingContainer, containerDTO));
+        Container saved = containerRepository.save(updateContainerByDTO(existingContainer, containerDTO));
         return mapContainerDTO(saved);
     }
 
@@ -91,10 +87,9 @@ public class ContainerService {
     public List<Container> search(
             String containerType,
             Long originId,
-            Long destinationId,
-            TrackingEventTypes status
+            Long destinationId
     ) {
-        return containerRepository.searchContainer(containerType, originId, destinationId, status);
+        return containerRepository.searchContainer(containerType, originId, destinationId);
     }
 
 }

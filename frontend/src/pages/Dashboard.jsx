@@ -19,7 +19,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import useAuthStore from "../authentication/useAuthStore";
 import Sidebar from "../components/Sidebar";
-import ProgressBar from "../components/ProgressBar";
+// import ProgressBar from "../components/ProgressBar";
 
 function Dashboard() {
   const [containers, setContainers] = useState([]);
@@ -587,9 +587,9 @@ function Dashboard() {
                   </motion.p>
                 ))}
               </div>
-              <div className="pt-5">
+              {/* <div className="pt-5">
                 <ProgressBar />
-              </div>
+              </div> */}
             </motion.div>
           )}
         </AnimatePresence>

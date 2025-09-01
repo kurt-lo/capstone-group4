@@ -48,16 +48,10 @@ public class ContainerController {
             @RequestParam(required = false) Long destinationId,
             @RequestParam(required = false) String status
     ) {
-        TrackingEventTypes trackingEventTypes = null;
-        if (status != null && !status.isEmpty()) {
-            trackingEventTypes = TrackingEventTypes.valueOf(status.toUpperCase());
-        }
-
         return containerService.search(
                 containerType,
                 originId,
-                destinationId,
-                trackingEventTypes
+                destinationId
         );
     }
 
