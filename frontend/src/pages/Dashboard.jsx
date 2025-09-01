@@ -16,6 +16,8 @@ import {
   Legend,
 } from "recharts";
 import axios from "axios";
+import { toast } from "react-toastify";
+import useAuthStore from "../authentication/useAuthStore";
 
 function Dashboard() {
   const [containers, setContainers] = useState([]);
@@ -23,8 +25,25 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [selectedContainer, setSelectedContainer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const token = useAuthStore((state) => state.user?.token);
+
+  // Add Container
+  const [formData, setFormData] = useState({
+    containerType: "",
+    origin: "",
+    destination: "",
+    weight: "",
+    containerSize: "",
+    departureDate: "",
+    arrivalDate: "",
+    createdBy: "",
+  });
 
   const COLORS = ["#6366F1", "#22D3EE", "#F472B6", "#34D399"];
+
+  function getFormattedLocalDateTime(value) {
+    console.log(value);
+  }
 
   // Format date function
   function formatDate(dateString) {
@@ -43,30 +62,32 @@ function Dashboard() {
     return `${datePart} ${timePart}`;
   }
 
-  // Add Container
-  const [formData, setFormData] = useState({
-    containerType: "",
-    origin: "",
-    destination: "",
-    weight: "",
-    containerSize: "",
-    departureDate: "",
-    arrivalDate: "",
-    createdBy: "",
-  });
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      console.log(token);
+      const response = await axios.post(
+        `http://localhost:9090/api/containers/create`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
       console.log("New Container:", formData);
-      // TODO: send to backend
+      toast.success("Container created successfully!");
+      fetchContainers();
     } catch (error) {
+      toast.error("Error creating container!");
     } finally {
       setIsModalOpen(false);
       setFormData({
@@ -81,27 +102,46 @@ function Dashboard() {
     }
   };
 
+  // Delete container
+  const handleDelete = async (id) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:9090/api/containers/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      toast.success(response.body);
+    } catch (error) {
+      toast.error(response.body);
+    }
+  };
+
+  const fetchContainers = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      const fetchContainers = await axios.get(
+        "http://localhost:9090/api/containers",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = fetchContainers.data;
+      setContainers(data);
+    } catch (e) {
+      console.error("Failed to fetch containers:", e);
+      setError("Failed to load containers. Please check the backend.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch containers
   useEffect(() => {
-    const fetchContainers = async () => {
-      try {
-        setError(null);
-        setLoading(true);
-
-        const fetchContainers = await axios.get(
-          "http://localhost:9090/api/containers"
-        );
-
-        const data = fetchContainers.data;
-        setContainers(data);
-      } catch (e) {
-        console.error("Failed to fetch containers:", e);
-        setError("Failed to load containers. Please check the backend.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchContainers();
   }, []);
 
@@ -276,7 +316,7 @@ function Dashboard() {
                 <h1 className="text-2xl font-bold text-white">My Containers</h1>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition"
+                  className="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition cursor-pointer"
                 >
                   Add Container
                 </button>
@@ -291,7 +331,7 @@ function Dashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 30 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="w-full table-auto text-left"
+                  className="w-full table-auto h-[10rem] text-left overflow-scroll"
                 >
                   <thead>
                     <tr className="bg-gray-700/0 text-white">
@@ -318,6 +358,9 @@ function Dashboard() {
                       </th>
                       <th className="border-b border-blue-gray-100 p-5">
                         Arrival Date
+                      </th>
+                      <th className="border-b border-blue-gray-100 p-5">
+                        Actions
                       </th>
                     </tr>
                   </thead>
@@ -355,6 +398,42 @@ function Dashboard() {
                         </td>
                         <td className="p-5 border-b border-gray-700 text-white">
                           {formatDate(container.arrivalDate)}
+                        </td>
+
+                        <td className="p-5 border-b border-gray-700 text-white">
+                          {/* Open the modal using document.getElementById('ID').showModal() method */}
+                          <button
+                            className="btn btn-error text-white"
+                            onClick={() =>
+                              document.getElementById("my_modal_5").showModal()
+                            }
+                          >
+                            Delete
+                          </button>
+                          <dialog
+                            id="my_modal_5"
+                            className="modal modal-bottom sm:modal-middle"
+                          >
+                            <div className="modal-box">
+                              <h3 className="font-bold text-lg text-error">Confirm Delete</h3>
+                              <p className="py-4">
+                                Are you sure you want to delete this container? 
+                              </p>
+                              <div className="modal-action">
+                                <button
+                                  className="btn btn-soft btn-error"
+                                  onClick={() =>
+                                    handleDelete(container.containerId)
+                                  }
+                                >
+                                  Confirm Delete
+                                </button>
+                                <form method="dialog">
+                                  <button className="btn btn-outline">Cancel</button>
+                                </form>
+                              </div>
+                            </div>
+                          </dialog>
                         </td>
                       </motion.tr>
                     ))}
@@ -516,9 +595,9 @@ function Dashboard() {
                   <div>
                     <label className="block text-sm mb-2">Departure Date</label>
                     <input
-                      type="date"
+                      type="datetime-local"
                       name="departureDate"
-                      value={formData.departureDate}
+                      value={getFormattedLocalDateTime(formData.departureDate)}
                       onChange={handleChange}
                       className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
                       required
@@ -527,9 +606,9 @@ function Dashboard() {
                   <div>
                     <label className="block text-sm mb-2">Arrival Date</label>
                     <input
-                      type="date"
+                      type="datetime-local"
                       name="arrivalDate"
-                      value={formData.arrivalDate}
+                      value={getFormattedLocalDateTime(formData.arrivalDate)}
                       onChange={handleChange}
                       className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
                       required
