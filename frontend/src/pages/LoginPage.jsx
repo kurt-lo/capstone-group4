@@ -53,7 +53,8 @@ function LoginPage() {
 
       toast.success("Login success!");
 
-      navigate(role === "admin" ? "/admin/dashboard" : "/dashboard");
+      // navigate(role === "admin" ? "/admin/dashboard" : "/dashboard");
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       toast.error("Invalid Email or Password!");
