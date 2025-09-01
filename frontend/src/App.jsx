@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ReportsPage from "./pages/ReportsPage";
 import HomePage from "./pages/HomePage";
-import Profile from "./pages/Profile";
+import Profile from "./pages/ProfilePage.jsx";
 
 function App() {
   return (
