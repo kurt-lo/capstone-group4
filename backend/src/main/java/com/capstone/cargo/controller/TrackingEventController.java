@@ -20,8 +20,14 @@ public class TrackingEventController {
 
     @GetMapping()
     public ResponseEntity<List<TrackingEventDTO>> getTrackingEvents() {
-        List<TrackingEventDTO> getAllTrackingEvents = trackingEventService.getAllTrackingEvents();
-        return new ResponseEntity<>(getAllTrackingEvents, HttpStatus.OK);
+        List<TrackingEventDTO> trackingEvents = trackingEventService.getAllTrackingEvents();
+        return new ResponseEntity<>(trackingEvents, HttpStatus.OK);
+    }
+
+    @GetMapping("/container/{containerId}")
+    public ResponseEntity<List<TrackingEventDTO>> getTrackingEventsByContainer(@PathVariable Long containerId) {
+        List<TrackingEventDTO> trackingEvents = trackingEventService.getTrackingEventsByContainerId(containerId);
+        return new ResponseEntity<>(trackingEvents, HttpStatus.OK);
     }
 
     @PostMapping("/create")

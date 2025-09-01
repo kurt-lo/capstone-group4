@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.capstone.cargo.mapper.MapperDTOUtils.containerBuilder;
 import static com.capstone.cargo.mapper.TrackingEventDTOMapper.*;
 
 @Service
@@ -20,6 +21,12 @@ public class TrackingEventService {
 
     public List<TrackingEventDTO> getAllTrackingEvents() {
         return trackingEventRepository.findAll().stream()
+                .map(TrackingEventDTOMapper::mapTrackingEventDTO)
+                .toList();
+    }
+
+    public List<TrackingEventDTO> getTrackingEventsByContainerId(Long containerId) {
+        return trackingEventRepository.findByContainerContainerId(containerId).stream()
                 .map(TrackingEventDTOMapper::mapTrackingEventDTO)
                 .toList();
     }
