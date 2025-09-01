@@ -37,12 +37,12 @@ function Dashboard() {
     weight: "",
     containerSize: "",
     departureDate: "",
+    status: "",
     arrivalDate: "",
     createdBy: "",
   });
 
   const COLORS = ["#6366F1", "#22D3EE", "#F472B6", "#34D399"];
-
 
   // Format date function
   function formatDate(dateString) {
@@ -176,12 +176,10 @@ function Dashboard() {
   if (error) return <div style={{ color: "crimson" }}>{error}</div>;
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-1 bg-gray-900 min-h-screen">
+    <div className="p-5 bg-gray-900 min-h-screen ">
       {/* Layout Wrapper to allow squeezing */}
       <div className="flex h-screen">
-        <div className="flex flex-col gap-6 w-full m-4">
+        <div className="flex flex-col gap-6 w-full">
           <motion.div
             layout
             className={`flex-1 flex flex-col gap-6 transition-all duration-500 `}
@@ -416,7 +414,9 @@ function Dashboard() {
                             className="modal modal-bottom sm:modal-middle"
                           >
                             <div className="modal-box">
-                              <h3 className="font-bold text-lg text-error">Confirm Delete</h3>
+                              <h3 className="font-bold text-lg text-error">
+                                Confirm Delete
+                              </h3>
                               <p className="py-4">
                                 Are you sure you want to delete this container?
                               </p>
@@ -430,7 +430,9 @@ function Dashboard() {
                                   Confirm Delete
                                 </button>
                                 <form method="dialog">
-                                  <button className="btn btn-outline">Cancel</button>
+                                  <button className="btn btn-outline">
+                                    Cancel
+                                  </button>
                                 </form>
                               </div>
                             </div>
@@ -455,11 +457,11 @@ function Dashboard() {
               exit={{ x: "100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 80, damping: 20 }}
               layout
-              className="my-4 mx-6 w-[20%] bg-gray-900/60 backdrop-blur-xl rounded-2xl shadow-xl border border-cyan-400/60 p-6 text-white flex-shrink-0"
+              className="mx-6 w-[20%] bg-gray-900/60 backdrop-blur-xl rounded-2xl shadow-xl border border-cyan-400/60 p-6 text-white flex-shrink-0"
             >
               {/* Close Button */}
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-[#00c36c]">Container Details</h2>
+                <h2 className="text-xl font-bold">Container Details</h2>
                 <button
                   onClick={() => setSelectedContainer(null)}
                   className="text-gray-400 hover:text-white transition"
@@ -469,7 +471,7 @@ function Dashboard() {
               </div>
 
               {/* Container details */}
-              <div className="space-y-2 ">
+              <div className="space-y-3">
                 {[
                   { label: "ID", value: selectedContainer.containerId },
                   { label: "Type", value: selectedContainer.containerType },
@@ -597,11 +599,27 @@ function Dashboard() {
                     />
                   </div>
                   <div>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleChange}
+                      className="border rounded p-2"
+                    >
+                      <option value="">-- Select Status --</option>
+                      <option value="DISCHARGED">DISCHARGED</option>
+                      <option value="VANNING">VANNING</option>
+                      <option value="IN_TRANSIT">IN_TRANSIT</option>
+                      <option value="DEVANNING">DEVANNING</option>
+                      <option value="RECEIVED">RECEIVED</option>
+                      <option value="OPEN">OPEN</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm mb-2">Departure Date</label>
                     <input
                       type="datetime-local"
                       name="departureDate"
-                      value={getFormattedLocalDateTime(formData.departureDate)}
+                      value={formData.departureDate}
                       onChange={handleChange}
                       className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
                       required
@@ -612,7 +630,7 @@ function Dashboard() {
                     <input
                       type="datetime-local"
                       name="arrivalDate"
-                      value={getFormattedLocalDateTime(formData.arrivalDate)}
+                      value={formData.arrivalDate}
                       onChange={handleChange}
                       className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
                       required
@@ -631,7 +649,6 @@ function Dashboard() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
       </div>
     </div>
   );
