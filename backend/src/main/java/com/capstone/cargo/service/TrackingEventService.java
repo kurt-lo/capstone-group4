@@ -41,6 +41,7 @@ public class TrackingEventService {
                 trackingEventRepository.save(mapTrackingEvent(trackingEventDTO))
                 : mapNewTrackingEvent(trackingEventDTO);
 
+        trackingEventRepository.save(saved);
         return mapTrackingEventDTO(saved);
     }
 }

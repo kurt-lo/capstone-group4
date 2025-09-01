@@ -42,26 +42,57 @@ public class ContainerController {
         return new ResponseEntity<>(containers, HttpStatus.OK);
     }
 
-    @GetMapping("/search")
-    public List<Container> searchContainers(
-            @RequestParam(required = false) String containerType,
-            @RequestParam(required = false) String owner,
-            @RequestParam(required = false) Long originId,
-            @RequestParam(required = false) Long destinationId,
-            @RequestParam(required = false) String status
-    ) {
-        TrackingEventTypes trackingEventTypes = null;
-        if (status != null && !status.isEmpty()) {
-            trackingEventTypes = TrackingEventTypes.valueOf(status.toUpperCase());
-        }
+//    @GetMapping("/search")
+//    public List<Container> searchContainers(
+//            @RequestParam(required = false) String containerType,
+//            @RequestParam(required = false) String owner,
+//            @RequestParam(required = false) Long originId,
+//            @RequestParam(required = false) Long destinationId,
+//            @RequestParam(required = false) String status
+//    ) {
+//        TrackingEventTypes trackingEventTypes = null;
+//        if (status != null && !status.isEmpty()) {
+//            trackingEventTypes = TrackingEventTypes.valueOf(status.toUpperCase());
+//        }
+//
+//        return containerService.search(
+//                containerType,
+//                originId,
+//                destinationId,
+//                trackingEventTypes
+//        );
+//    }
 
-        return containerService.search(
-                containerType,
-                originId,
-                destinationId,
-                trackingEventTypes
-        );
-    }
+//    @GetMapping("/search")
+//    public ResponseEntity<List<ContainerDTO>> searchContainers(
+//            @RequestParam(required = false) Long originId,
+//            @RequestParam(required = false) Long destinationId,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate
+//    ) {
+//        if (startDate != null && endDate != null && destinationId != null) {
+//            List<ContainerDTO> containers = containerService.getContainersByDayRange(destinationId, startDate, endDate);
+//            return containers.isEmpty() ?
+//                    ResponseEntity.noContent().build()
+//                    : new ResponseEntity<>(containers, HttpStatus.OK);
+//        } else {
+//            TrackingEventTypes trackingEventTypes = null;
+//            if (status != null && !status.isEmpty()) {
+//                trackingEventTypes = TrackingEventTypes.valueOf(status.toUpperCase());
+//            }
+//            List<Container> containers = containerService.search(
+//                    originId,
+//                    destinationId,
+//                    trackingEventTypes
+//            );
+//            List<ContainerDTO> containerDTOs = containers.stream()
+//                    .map(com.capstone.cargo.mapper.ContainerDTOMapper::mapContainerDTO)
+//                    .toList();
+//            return containerDTOs.isEmpty() ?
+//                    ResponseEntity.noContent().build()
+//                    : new ResponseEntity<>(containerDTOs, HttpStatus.OK);
+//        }
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ContainerDTO> getContainerById(@PathVariable Long id){
@@ -69,17 +100,17 @@ public class ContainerController {
         return new ResponseEntity<>(container, HttpStatus.OK);
     }
 
-    @GetMapping("/day-range")
-    public ResponseEntity<List<ContainerDTO>> getContainersByDayRange(
-            @RequestParam Long locationId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate){
-        List<ContainerDTO> containers = containerService.getContainersByDayRange(locationId, startDate, endDate);
-
-        return containers.isEmpty() ?
-                ResponseEntity.noContent().build()
-                : new ResponseEntity<>(containers, HttpStatus.OK);
-    }
+//    @GetMapping("/day-range")
+//    public ResponseEntity<List<ContainerDTO>> getContainersByDayRange(
+//            @RequestParam Long locationId,
+//            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+//            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate){
+//        List<ContainerDTO> containers = containerService.getContainersByDayRange(locationId, startDate, endDate);
+//
+//        return containers.isEmpty() ?
+//                ResponseEntity.noContent().build()
+//                : new ResponseEntity<>(containers, HttpStatus.OK);
+//    }
 
     @PostMapping("/create")
     public ResponseEntity<ContainerDTO> createContainer(@Valid @RequestBody ContainerDTO container){

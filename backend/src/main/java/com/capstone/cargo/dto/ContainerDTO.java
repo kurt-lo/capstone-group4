@@ -21,7 +21,6 @@ public class ContainerDTO {
     private String destination_city;
     private String destination_country;
     private BigDecimal weight;
-    private TrackingEventTypes status;
     private String containerSize;
     private LocalDateTime departureDate;
     private LocalDateTime arrivalDate;

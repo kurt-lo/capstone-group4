@@ -46,9 +46,6 @@ public class Container extends BaseEntity {
     @Column(name = "ARRIVAL_DATE")
     private LocalDateTime arrivalDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TrackingEventTypes status;
 }
 
 

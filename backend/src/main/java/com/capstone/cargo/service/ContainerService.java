@@ -1,6 +1,5 @@
 package com.capstone.cargo.service;
 
-import com.capstone.cargo.Event.TrackingEventTypes;
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.mapper.ContainerDTOMapper;
 import com.capstone.cargo.model.Container;
@@ -86,12 +85,10 @@ public class ContainerService {
     }
 
     public List<Container> search(
-            String containerType,
             Long originId,
-            Long destinationId,
-            TrackingEventTypes status
+            Long destinationId
     ) {
-        return containerRepository.searchContainer(containerType, originId, destinationId, status);
+        return containerRepository.searchContainer(originId, destinationId);
     }
 
 }
