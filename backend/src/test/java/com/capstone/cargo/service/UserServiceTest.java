@@ -1,5 +1,6 @@
 package com.capstone.cargo.service;
 
+import com.capstone.cargo.dto.UserDTO;
 import com.capstone.cargo.exception.ResourceAlreadyExistsException;
 import com.capstone.cargo.exception.ResourceNotFoundException;
 import com.capstone.cargo.exception.UsersNotFoundException;
@@ -54,9 +55,9 @@ public class UserServiceTest {
         updatedInfo = new User();
         updatedInfo.setFirstName("UpdatedAlexa");
         updatedInfo.setLastName("UpdatedSiri");
-        updatedInfo.setUsername("UpdatedUsername");
-        updatedInfo.setPassword("NewPass@123");
         updatedInfo.setEmailAddress("alexa@siri.com");
+        updatedInfo.setRole(Role.USER);
+        updatedInfo.setCompanyName("UpdatedCompany");
     }
 
     @Test
@@ -129,27 +130,22 @@ public class UserServiceTest {
 
     @Test
     void test_givenExistingUser_whenUpdateUser_thenReturnUpdatedUser() {
-        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
-        when(userRepository.existsByUsername("UpdatedUsername")).thenReturn(false);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.existsByEmailAddress("alexa@siri.com")).thenReturn(false);
-        when(passwordEncoder.encode("NewPass@123")).thenReturn("EncodedNewPass@123");
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        User result = userService.updateUser(1L, updatedInfo);
+        UserDTO result = userService.updateUser(1L, updatedInfo);
 
         assertNotNull(result);
         assertEquals("UpdatedAlexa", result.getFirstName());
         assertEquals("UpdatedSiri", result.getLastName());
-        assertEquals("UpdatedUsername", result.getUsername());
-        assertEquals("EncodedNewPass@123", result.getPassword());
         assertEquals("alexa@siri.com", result.getEmailAddress());
+        assertEquals("USER", result.getUserRole());
+        assertEquals("UpdatedCompany", result.getCompanyName());
 
         verify(userRepository, times(1)).findById(1L);
-        verify(userRepository, times(1)).existsByUsername("UpdatedUsername");
         verify(userRepository, times(1)).existsByEmailAddress("alexa@siri.com");
-        verify(passwordEncoder, times(1)).encode("NewPass@123");
         verify(userRepository, times(1)).save(any(User.class));
-
     }
 
     @Test
@@ -161,23 +157,7 @@ public class UserServiceTest {
 
         assertEquals("User not found", exception.getMessage());
         verify(userRepository, times(1)).findById(3L);
-        verify(userRepository, never()).existsByUsername(anyString());
         verify(userRepository, never()).existsByEmailAddress(anyString());
-        verify(passwordEncoder, never()).encode(anyString());
-        verify(userRepository, never()).save(any(User.class));
-    }
-
-    @Test
-    void test_givenExistingUsername_whenUpdateUser_thenThrowException() {
-        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
-        when(userRepository.existsByUsername("UpdatedUsername")).thenReturn(true);
-
-        ResourceAlreadyExistsException exception = assertThrows(ResourceAlreadyExistsException.class,
-                () -> userService.updateUser(1L, updatedInfo));
-
-        assertEquals("Username already exists", exception.getMessage());
-        verify(userRepository, times(1)).findById(1L);
-        verify(userRepository, times(1)).existsByUsername("UpdatedUsername");
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -202,12 +182,14 @@ public class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        User result = userService.updateUser(1L, emptyUpdate);
-        assertNotNull(result);
-        assertEquals(user.getId(), result.getId());
-        assertEquals(user.getUsername(), result.getUsername());
-        assertEquals(user.getPassword(), result.getPassword());
-        assertEquals(user.getEmailAddress(), result.getEmailAddress());
+        UserDTO noUpdatedUser = userService.updateUser(1L, emptyUpdate);
+
+        assertNotNull(noUpdatedUser);
+        assertEquals(user.getFirstName(), noUpdatedUser.getFirstName());
+        assertEquals(user.getLastName(), noUpdatedUser.getLastName());
+        assertEquals(user.getEmailAddress(), noUpdatedUser.getEmailAddress());
+        assertEquals(user.getRole().name(), noUpdatedUser.getUserRole());
+        assertEquals(user.getCompanyName(), noUpdatedUser.getCompanyName());
 
         verify(userRepository, times(1)).findById(1L);
         verify(userRepository, never()).existsByUsername(anyString());
@@ -217,38 +199,19 @@ public class UserServiceTest {
     }
 
     @Test
-    void test_givenUsernameIsSame_whenUpdateUser_thenReturnUnchangedUser() {
-        user.setUsername("AlexaSiri00");
-        updatedInfo.setUsername("AlexaSiri00");
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepository.existsByUsername("AlexaSiri00")).thenReturn(true);
-        when(userRepository.save(any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
-        User result = userService.updateUser(1L, updatedInfo);
-
-        assertNotNull(result);
-        assertEquals("AlexaSiri00", result.getUsername());
-        verify(userRepository, times(1)).findById(1L);
-        verify(userRepository, times(1)).existsByUsername("AlexaSiri00");
-        verify(userRepository, times(1)).save(any(User.class));
-    }
-
-    @Test
     void test_givenEmailIsSame_whenUpdateUser_thenReturnUnchangedUser() {
         user.setEmailAddress("alexa@siri.com");
-        updatedInfo.setUsername("alexa@siri.com");
+        updatedInfo.setEmailAddress("alexa@siri.com");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.existsByEmailAddress("alexa@siri.com")).thenReturn(true);
         when(userRepository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        User result = userService.updateUser(1L, updatedInfo);
+        UserDTO noUpdateUser = userService.updateUser(1L, updatedInfo);
 
-        assertNotNull(result);
-        assertEquals("alexa@siri.com", result.getEmailAddress());
+        assertNotNull(noUpdateUser);
+        assertEquals(user.getEmailAddress(), noUpdateUser.getEmailAddress());
         verify(userRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).existsByEmailAddress("alexa@siri.com");
         verify(userRepository, times(1)).save(any(User.class));

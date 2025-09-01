@@ -4,6 +4,7 @@ import com.capstone.cargo.dto.AuthLoginDto;
 import com.capstone.cargo.dto.AuthRegistrationDto;
 import com.capstone.cargo.dto.JwtResponseDto;
 import com.capstone.cargo.exception.InvalidCredentialsException;
+import com.capstone.cargo.exception.InvalidRoleException;
 import com.capstone.cargo.exception.ResourceAlreadyExistsException;
 import com.capstone.cargo.jwt.JwtUtil;
 import com.capstone.cargo.mapper.AuthMapper;
@@ -85,7 +86,6 @@ class AuthServiceTest {
         assertNotNull(jwtUtil);
     }
 
-
     @Test
     void test_givenUser_whenRegisterUser_thenReturnSuccessMessage() {
         when(authMapper.fromRegistrationDtoToUser(authRegistrationDto, Role.USER)).thenReturn(user);
@@ -105,7 +105,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void test_givenExistingUsername_whenRegisterUser_thenReturnErrorMessage() {
+    void test_givenExistingUsername_whenRegisterUser_thenReturnResourceAlreadyExistsException() {
         when(userRepository.existsByUsername(user.getUsername())).thenReturn(true);
 
         ResourceAlreadyExistsException exception = assertThrows(ResourceAlreadyExistsException.class,
@@ -119,7 +119,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void test_givenExistingEmailAddress_whenRegisterUser_thenReturnErrorMessage() {
+    void test_givenExistingEmailAddress_whenRegisterUser_thenReturnResourceAlreadyExistsException() {
         when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
         when(userRepository.existsByEmailAddress(user.getEmailAddress())).thenReturn(true);
 
@@ -134,17 +134,18 @@ class AuthServiceTest {
     }
 
     @Test
-    void test_givenValidCredentials_whenLoginUser_thenReturnJwtResponseDto() {
+    void test_givenValidCredentials_whenLoginUser_thenReturnJwtToken() {
         Authentication authentication = mock(Authentication.class);
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
         when(authentication.getName()).thenReturn("AlexaSiri00");
         when(userRepository.findByUsername("AlexaSiri00")).thenReturn(Optional.of(user));
-        when(jwtUtil.generateToken("AlexaSiri00", "USER", null))
+        when(passwordEncoder.matches(validUserLoginDto.getPassword(), user.getPassword())).thenReturn(true);
+        when(jwtUtil.generateToken(validUserLoginDto.getUsername(), user.getRole().name(), null))
                 .thenReturn("test-jwt-token");
 
-        JwtResponseDto response = authService.login(validUserLoginDto);
+        JwtResponseDto response = authService.login(validUserLoginDto, Role.USER);
 
         assertNotNull(response);
         assertEquals("AlexaSiri00", response.getUsername());
@@ -153,17 +154,18 @@ class AuthServiceTest {
         verify(authenticationManager, times(1))
                 .authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(userRepository, times(1)).findByUsername("AlexaSiri00");
+        verify(passwordEncoder, times(1)).matches(validUserLoginDto.getPassword(), user.getPassword());
         verify(jwtUtil, times(1)).generateToken("AlexaSiri00", "USER", null);
     }
 
     @Test
-    void test_givenInvalidCredentials_whenLoginUser_thenThrowExceptionMessage() {
+    void test_givenInvalidCredentials_whenLoginUser_thenThrowInvalidCredentialsException() {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
         InvalidCredentialsException exception = assertThrows(
                 InvalidCredentialsException.class,
-                () -> authService.login(invalidUserloginDto)
+                () -> authService.login(invalidUserloginDto, Role.USER)
         );
 
         assertEquals("Invalid username or password", exception.getMessage());
@@ -175,13 +177,13 @@ class AuthServiceTest {
     }
 
     @Test
-    void test_givenInvalidUsername_whenLoginUser_thenThrowExceptionMessage() {
+    void test_givenInvalidUsername_whenLoginUser_thenThrowInvalidCredentialsException() {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
         InvalidCredentialsException exception = assertThrows(
                 InvalidCredentialsException.class,
-                () -> authService.login(new AuthLoginDto("wrongUser", "correctPassword"))
+                () -> authService.login(invalidUserloginDto, Role.USER)
         );
 
         assertEquals("Invalid username or password", exception.getMessage());
@@ -193,13 +195,34 @@ class AuthServiceTest {
     }
 
     @Test
-    void test_givenInvalidPassword_whenLoginUser_thenThrowExceptionMessage() {
+    void test_givenInvalidPassword_whenLoginUser_thenThrowInvalidCredentialsException() {
+        Authentication authentication = mock(Authentication.class);
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+        when(authentication.getName()).thenReturn("AlexaSiri00");
+        when(userRepository.findByUsername("AlexaSiri00")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(validUserLoginDto.getPassword(), user.getPassword()))
+                .thenReturn(false);
+
+        InvalidCredentialsException exception = assertThrows(
+                InvalidCredentialsException.class,
+                () -> authService.login(validUserLoginDto, Role.USER)
+        );
+
+        assertEquals("Invalid password", exception.getMessage());
+        verify(passwordEncoder, times(1)).matches(validUserLoginDto.getPassword(), user.getPassword());
+        verify(jwtUtil, never()).generateToken(any(), any(), any());
+    }
+
+    @Test
+    void test_givenNullUsername_whenLoginUser_thenThrowInvalidCredentialsException() {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
         InvalidCredentialsException exception = assertThrows(
                 InvalidCredentialsException.class,
-                () -> authService.login(new AuthLoginDto("correctUsername", "wrongPassword"))
+                () -> authService.login(new AuthLoginDto(null, "somePassword"), Role.USER)
         );
 
         assertEquals("Invalid username or password", exception.getMessage());
@@ -211,13 +234,13 @@ class AuthServiceTest {
     }
 
     @Test
-    void test_givenNullUsername_whenLoginUser_thenThrowExceptionMessage() {
+    void test_givenNullPassword_whenLoginUser_thenThrowInvalidCredentialsException() {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
         InvalidCredentialsException exception = assertThrows(
                 InvalidCredentialsException.class,
-                () -> authService.login(new AuthLoginDto(null, "somePassword"))
+                () -> authService.login(new AuthLoginDto("someUsername", null), Role.USER)
         );
 
         assertEquals("Invalid username or password", exception.getMessage());
@@ -229,21 +252,41 @@ class AuthServiceTest {
     }
 
     @Test
-    void test_givenNullPassword_whenLoginUser_thenThrowExceptionMessage() {
+    void test_givenInvalidAdminRole_whenLoginUser_thenThrowInvalidRoleException() {
+        Authentication authentication = mock(Authentication.class);
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new BadCredentialsException("Bad credentials"));
+                .thenReturn(authentication);
+        when(authentication.getName()).thenReturn("AlexaSiri00");
+        when(userRepository.findByUsername("AlexaSiri00")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(validUserLoginDto.getPassword(), user.getPassword())).thenReturn(true);
+
+        InvalidRoleException exception = assertThrows(
+                InvalidRoleException.class,
+                () -> authService.login(validUserLoginDto, Role.ADMIN) // user has USER role
+        );
+
+        assertEquals("Invalid role for this login endpoint", exception.getMessage());
+        verify(jwtUtil, never()).generateToken(any(), any(), any());
+    }
+
+    @Test
+    void test_givenUserNotFound_whenLoginUser_thenThrowInvalidCredentialsException() {
+        Authentication authentication = mock(Authentication.class);
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+        when(authentication.getName()).thenReturn("GhostUser");
+        when(userRepository.findByUsername("GhostUser")).thenReturn(Optional.empty());
 
         InvalidCredentialsException exception = assertThrows(
                 InvalidCredentialsException.class,
-                () -> authService.login(new AuthLoginDto("someUsername", null))
+                () -> authService.login(invalidUserloginDto, Role.USER)
         );
 
         assertEquals("Invalid username or password", exception.getMessage());
-        assertTrue(exception.getCause() instanceof BadCredentialsException);
-
-        verify(authenticationManager, times(1))
-                .authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtUtil, never()).generateToken(anyString(), anyString(), any());
+        verify(userRepository, times(1)).findByUsername("GhostUser");
+        verify(jwtUtil, never()).generateToken(any(), any(), any());
     }
 
 }

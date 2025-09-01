@@ -4,6 +4,7 @@ import com.capstone.cargo.dto.AuthLoginDto;
 import com.capstone.cargo.dto.AuthRegistrationDto;
 import com.capstone.cargo.dto.JwtResponseDto;
 import com.capstone.cargo.exception.InvalidCredentialsException;
+import com.capstone.cargo.exception.InvalidRoleException;
 import com.capstone.cargo.exception.ResourceAlreadyExistsException;
 import com.capstone.cargo.jwt.JwtUtil;
 import com.capstone.cargo.mapper.AuthMapper;
@@ -78,11 +79,11 @@ public class AuthService {
                     .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));
 
             if (!passwordEncoder.matches(authLoginDto.getPassword(), user.getPassword())) {
-                throw new RuntimeException("Invalid password");
+                throw new InvalidCredentialsException("Invalid password");
             }
 
             if (!user.getRole().equals(expectedRole)) {
-                throw new RuntimeException("Invalid role for this login endpoint");
+                throw new InvalidRoleException("Invalid role for this login endpoint");
             }
 
             String token = jwtUtil.generateToken(
