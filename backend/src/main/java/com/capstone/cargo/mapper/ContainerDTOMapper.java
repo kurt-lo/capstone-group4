@@ -2,10 +2,8 @@ package com.capstone.cargo.mapper;
 
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.model.Container;
-import com.capstone.cargo.model.Location;
 
 import static com.capstone.cargo.mapper.MapperDTOUtils.cityBuilder;
-import static com.capstone.cargo.mapper.MapperDTOUtils.locationBuilder;
 
 public class ContainerDTOMapper {
 

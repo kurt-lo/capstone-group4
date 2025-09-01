@@ -31,14 +31,14 @@ public class TrackingEvent extends BaseEntity {
     private Container container;
 
     @ManyToOne
-    @JoinColumn(name = "LOCATION_ID", referencedColumnName = "LOCATION_ID")
-    private Location location;
+    @JoinColumn(name = "LOCATION_ID", referencedColumnName = "CITY_ID")
+    private City location;
 
     @ManyToOne
-    @JoinColumn(name = "NEXT_LOCATION_ID", referencedColumnName = "LOCATION_ID")
-    private Location nextLocation;
+    @JoinColumn(name = "NEXT_LOCATION_ID", referencedColumnName = "CITY_ID")
+    private City nextLocation;
 
     @ManyToOne
-    @JoinColumn(name = "PREVIOUS_LOCATION_ID", referencedColumnName = "LOCATION_ID")
-    private Location previousLocation;
+    @JoinColumn(name = "PREVIOUS_LOCATION_ID", referencedColumnName = "CITY_ID")
+    private City previousLocation;
 }
