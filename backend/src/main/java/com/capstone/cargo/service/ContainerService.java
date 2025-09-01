@@ -3,7 +3,7 @@ package com.capstone.cargo.service;
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.mapper.ContainerDTOMapper;
 import com.capstone.cargo.model.Container;
-import com.capstone.cargo.producer.KafkaProducer;
+//import com.capstone.cargo.producer.KafkaProducer;
 import com.capstone.cargo.repository.ContainerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ public class ContainerService {
     @Autowired
     private ContainerRepository containerRepository;
 
-    @Autowired
-    private KafkaProducer kafkaProducer;
+//    @Autowired
+//    private KafkaProducer kafkaProducer;
 
     public List<ContainerDTO> getAllContainers() {
         return containerRepository.findAll().stream()
@@ -45,7 +45,7 @@ public class ContainerService {
                 .toList();
     }
     public ContainerDTO createContainer(ContainerDTO containerDTO) {
-        Container container = mapContainer(containerDTO);
+        Container container = mapContainer(new Container(), containerDTO);
 
         Container saved = containerRepository.save(container);
         return mapContainerDTO(saved);
@@ -55,7 +55,7 @@ public class ContainerService {
         Container existingContainer = containerRepository.findByContainerId(id)
                 .orElseThrow(() -> new IllegalArgumentException("ID does not exist"));
 
-        Container saved = containerRepository.save(updateContainerByDTO(existingContainer, containerDTO));
+        Container saved = containerRepository.save(mapContainer(existingContainer, containerDTO));
         return mapContainerDTO(saved);
     }
 

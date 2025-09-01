@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SourceType;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +25,7 @@ public class TrackingEvent extends BaseEntity {
     @Column(name = "EVENT_TYPE", nullable = true, length = 10)
     private String eventType;
 
+    @CreationTimestamp(source = SourceType.DB)
     @Column(name = "EVENT_DATE")
     private LocalDateTime eventDate;
 
@@ -31,14 +34,14 @@ public class TrackingEvent extends BaseEntity {
     private Container container;
 
     @ManyToOne
-    @JoinColumn(name = "LOCATION_ID", referencedColumnName = "LOCATION_ID")
-    private Location location;
+    @JoinColumn(name = "LOCATION_ID", referencedColumnName = "CITY_ID")
+    private City location;
 
     @ManyToOne
-    @JoinColumn(name = "NEXT_LOCATION_ID", referencedColumnName = "LOCATION_ID")
-    private Location nextLocation;
+    @JoinColumn(name = "NEXT_LOCATION_ID", referencedColumnName = "CITY_ID")
+    private City nextLocation;
 
     @ManyToOne
-    @JoinColumn(name = "PREVIOUS_LOCATION_ID", referencedColumnName = "LOCATION_ID")
-    private Location previousLocation;
+    @JoinColumn(name = "PREVIOUS_LOCATION_ID", referencedColumnName = "CITY_ID")
+    private City previousLocation;
 }
