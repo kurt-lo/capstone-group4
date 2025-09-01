@@ -9,7 +9,7 @@ function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate(user?.role === "ADMIN" ? "/admin/login" : "/user/login");
+    navigate(user?.role === "admin" ? "/admin/login" : "/user/login");
   };
 
   return (
