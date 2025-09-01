@@ -16,6 +16,10 @@ import {
   Legend,
 } from "recharts";
 import axios from "axios";
+import { toast } from "react-toastify";
+import useAuthStore from "../authentication/useAuthStore";
+import Sidebar from "../components/Sidebar";
+import ProgressBar from "../components/ProgressBar";
 
 function Dashboard() {
   const [containers, setContainers] = useState([]);
@@ -23,6 +27,21 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [selectedContainer, setSelectedContainer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const token = useAuthStore((state) => state.user?.token);
+
+  // Add Container
+  const [formData, setFormData] = useState({
+    containerType: "",
+    origin: "",
+    destination: "",
+    weight: "",
+    containerSize: "",
+    departureDate: "",
+    status: "",
+    arrivalDate: "",
+    createdBy: "",
+  });
 
   const COLORS = ["#6366F1", "#22D3EE", "#F472B6", "#34D399"];
 
@@ -43,30 +62,31 @@ function Dashboard() {
     return `${datePart} ${timePart}`;
   }
 
-  // Add Container
-  const [formData, setFormData] = useState({
-    containerType: "",
-    origin: "",
-    destination: "",
-    weight: "",
-    containerSize: "",
-    departureDate: "",
-    arrivalDate: "",
-    createdBy: "",
-  });
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      const response = await axios.post(
+        `http://localhost:9090/api/containers/create`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
       console.log("New Container:", formData);
-      // TODO: send to backend
+      toast.success("Container created successfully!");
+      fetchContainers();
     } catch (error) {
+      toast.error("Error creating container!");
     } finally {
       setIsModalOpen(false);
       setFormData({
@@ -81,27 +101,88 @@ function Dashboard() {
     }
   };
 
+  // UPDATE CONTAINER
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.put(
+        `http://localhost:9090/api/containers/${selectedContainer.containerId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Container updated successfully!");
+      fetchContainers();
+    } catch (error) {
+      toast.error("Error updating container!");
+    } finally {
+      setIsUpdateModalOpen(false);
+      setFormData({
+        containerType: "",
+        origin: "",
+        destination: "",
+        weight: "",
+        containerSize: "",
+        departureDate: "",
+        arrivalDate: "",
+      });
+    }
+  };
+
+  // DELETE CONTAINER
+  const handleDelete = async (id) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:9090/api/containers/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      toast.success(response.body);
+    } catch (error) {
+      toast.error(response.body);
+    }
+  };
+
+  // GET ALL CONTAINERS
+  const fetchContainers = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      const fetchContainers = await axios.get(
+        "http://localhost:9090/api/containers",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = fetchContainers.data;
+      setContainers(data);
+    } catch (e) {
+      console.error("Failed to fetch containers:", e);
+      setError("Failed to load containers. Please check the backend.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch containers
   useEffect(() => {
-    const fetchContainers = async () => {
-      try {
-        setError(null);
-        setLoading(true);
-
-        const fetchContainers = await axios.get(
-          "http://localhost:9090/api/containers"
-        );
-
-        const data = fetchContainers.data;
-        setContainers(data);
-      } catch (e) {
-        console.error("Failed to fetch containers:", e);
-        setError("Failed to load containers. Please check the backend.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchContainers();
   }, []);
 
@@ -138,6 +219,7 @@ function Dashboard() {
 
   return (
     <div className="p-5 bg-gray-900 min-h-screen ">
+      {/* <Sidebar /> */}
       {/* Layout Wrapper to allow squeezing */}
       <div className="flex h-screen">
         <div className="flex flex-col gap-6 w-full">
@@ -276,7 +358,7 @@ function Dashboard() {
                 <h1 className="text-2xl font-bold text-white">My Containers</h1>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition"
+                  className="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition cursor-pointer"
                 >
                   Add Container
                 </button>
@@ -291,7 +373,7 @@ function Dashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 30 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="w-full table-auto text-left"
+                  className="w-full table-auto h-[10rem] text-left overflow-scroll"
                 >
                   <thead>
                     <tr className="bg-gray-700/0 text-white">
@@ -318,6 +400,9 @@ function Dashboard() {
                       </th>
                       <th className="border-b border-blue-gray-100 p-5">
                         Arrival Date
+                      </th>
+                      <th className="border-b border-blue-gray-100 p-5">
+                        Actions
                       </th>
                     </tr>
                   </thead>
@@ -356,6 +441,84 @@ function Dashboard() {
                         <td className="p-5 border-b border-gray-700 text-white">
                           {formatDate(container.arrivalDate)}
                         </td>
+
+                        <td className="p-5 border-b border-gray-700 text-white">
+                          <div className="flex flex-row space-x-1">
+                            <div className="flex gap-[1rem]">
+                              {/* UPDATE BUTTON*/}
+                              <button
+                                onClick={() => {
+                                  setIsUpdateModalOpen(true);
+                                  setSelectedContainer(container);
+                                  setFormData(container); // 👈 copy values into formData
+                                }}
+                                className="btn btn-info"
+                              >
+                                Update
+                              </button>
+
+                              {/* DELETE MODAL*/}
+                              <button
+                                className="btn btn-error text-white"
+                                onClick={() =>
+                                  document
+                                    .getElementById("my_modal_5")
+                                    .showModal()
+                                }
+                              >
+                                Delete
+                              </button>
+                            </div>
+                            <dialog
+                              id="my_modal_5"
+                              className="modal modal-bottom sm:modal-middle"
+                            >
+                              <div className="modal-box">
+                                <div className="flex flex-row">
+                                  <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-500/10 sm:mx-0 sm:size-10">
+                                    <svg
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-width="1.5"
+                                      data-slot="icon"
+                                      aria-hidden="true"
+                                      class="size-6 text-red-400"
+                                    >
+                                      <path
+                                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <h3 className="p-1 font-bold text-lg text-error">
+                                    Confirm Delete
+                                  </h3>
+                                </div>
+                                <p className="py-4">
+                                  Are you sure you want to delete this
+                                  container?
+                                </p>
+                                <div className="modal-action">
+                                  <button
+                                    className="btn btn-soft btn-error"
+                                    onClick={() =>
+                                      handleDelete(container.containerId)
+                                    }
+                                  >
+                                    Confirm Delete
+                                  </button>
+                                  <form method="dialog">
+                                    <button className="btn btn-outline">
+                                      Cancel
+                                    </button>
+                                  </form>
+                                </div>
+                              </div>
+                            </dialog>
+                          </div>
+                        </td>
                       </motion.tr>
                     ))}
                   </tbody>
@@ -382,7 +545,7 @@ function Dashboard() {
                 <h2 className="text-xl font-bold">Container Details</h2>
                 <button
                   onClick={() => setSelectedContainer(null)}
-                  className="text-gray-400 hover:text-white transition"
+                  className="text-gray-400 hover:text-white transition cursor-pointer"
                 >
                   ✕
                 </button>
@@ -423,6 +586,9 @@ function Dashboard() {
                     <strong>{item.label}:</strong> {item.value}
                   </motion.p>
                 ))}
+              </div>
+              <div className="pt-5">
+                <ProgressBar />
               </div>
             </motion.div>
           )}
@@ -514,9 +680,25 @@ function Dashboard() {
                     />
                   </div>
                   <div>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleChange}
+                      className="border rounded p-2"
+                    >
+                      <option value="">-- Select Status --</option>
+                      <option value="DISCHARGED">DISCHARGED</option>
+                      <option value="VANNING">VANNING</option>
+                      <option value="IN_TRANSIT">IN_TRANSIT</option>
+                      <option value="DEVANNING">DEVANNING</option>
+                      <option value="RECEIVED">RECEIVED</option>
+                      <option value="OPEN">OPEN</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm mb-2">Departure Date</label>
                     <input
-                      type="date"
+                      type="datetime-local"
                       name="departureDate"
                       value={formData.departureDate}
                       onChange={handleChange}
@@ -527,7 +709,7 @@ function Dashboard() {
                   <div>
                     <label className="block text-sm mb-2">Arrival Date</label>
                     <input
-                      type="date"
+                      type="datetime-local"
                       name="arrivalDate"
                       value={formData.arrivalDate}
                       onChange={handleChange}
@@ -541,6 +723,128 @@ function Dashboard() {
                       className="px-6 py-2 bg-green-600 hover:bg-green-500 rounded-lg shadow-md text-white font-medium"
                     >
                       Save Container
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {/* UPDATE CONTAINER */}
+        <AnimatePresence>
+          {isUpdateModalOpen && (
+            <motion.div
+              className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                className="bg-gray-900 w-[60%] max-w-3xl rounded-2xl shadow-lg p-8 border border-cyan-400/50 text-white"
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-cyan-400">
+                    Edit Container
+                  </h2>
+                  <button
+                    onClick={() => setIsUpdateModalOpen(false)}
+                    className="text-cyan-400 hover:text-cyan-200 cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <form
+                  onSubmit={handleUpdate}
+                  className="grid grid-cols-2 gap-6"
+                >
+                  <div>
+                    <label className="block text-sm mb-2">Container Type</label>
+                    <input
+                      type="text"
+                      name="containerType"
+                      value={formData.containerType}
+                      onChange={handleUpdateChange}
+                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2">Origin</label>
+                    <input
+                      type="text"
+                      name="origin"
+                      value={formData.origin}
+                      onChange={handleUpdateChange}
+                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2">Destination</label>
+                    <input
+                      type="text"
+                      name="destination"
+                      value={formData.destination}
+                      onChange={handleUpdateChange}
+                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2">Weight</label>
+                    <input
+                      type="number"
+                      name="weight"
+                      value={formData.weight}
+                      onChange={handleUpdateChange}
+                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2">Size</label>
+                    <input
+                      type="text"
+                      name="containerSize"
+                      value={formData.containerSize}
+                      onChange={handleUpdateChange}
+                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2">Departure Date</label>
+                    <input
+                      type="datetime-local"
+                      name="departureDate"
+                      value={formData.departureDate}
+                      onChange={handleUpdateChange}
+                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2">Arrival Date</label>
+                    <input
+                      type="datetime-local"
+                      name="arrivalDate"
+                      value={formData.arrivalDate}
+                      onChange={handleUpdateChange}
+                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      required
+                    />
+                  </div>
+                  <div className="col-span-2 flex justify-end">
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-green-600 hover:bg-green-500 rounded-lg shadow-md text-white font-medium cursor-pointer"
+                    >
+                      Update Container
                     </button>
                   </div>
                 </form>
