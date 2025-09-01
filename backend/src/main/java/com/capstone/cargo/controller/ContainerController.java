@@ -36,6 +36,27 @@ public class ContainerController {
         return new ResponseEntity<>(containers, HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public List<Container> searchContainers(
+            @RequestParam(required = false) String containerType,
+            @RequestParam(required = false) String owner,
+            @RequestParam(required = false) Long originId,
+            @RequestParam(required = false) Long destinationId,
+            @RequestParam(required = false) String status
+    ) {
+        TrackingEventTypes trackingEventTypes = null;
+        if (status != null && !status.isEmpty()) {
+            trackingEventTypes = TrackingEventTypes.valueOf(status.toUpperCase());
+        }
+
+        return containerService.search(
+                containerType,
+                originId,
+                destinationId,
+                trackingEventTypes
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ContainerDTO> getContainerById(@PathVariable Long id){
         ContainerDTO container = containerService.getContainerById(id).orElse(null);
