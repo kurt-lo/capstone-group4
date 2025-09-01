@@ -1,9 +1,10 @@
 package com.capstone.cargo.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.capstone.cargo.enums.ContainerStatus;
 import org.springframework.stereotype.Service;
 import com.capstone.cargo.producer.KafkaProducer;
 import com.capstone.cargo.model.Container;
@@ -11,13 +12,16 @@ import com.capstone.cargo.repository.ContainerRepository;
 
 @Service
 public class ContainerService {
-    @Autowired
-    private ContainerRepository containerRepository;
-    
-    @Autowired
-    private KafkaProducer kafkaProducer;
 
-    public List <Container> getAll (){
+    private final ContainerRepository containerRepository;
+    private final KafkaProducer kafkaProducer;
+
+    public ContainerService(ContainerRepository containerRepository, KafkaProducer kafkaProducer) {
+        this.containerRepository = containerRepository;
+        this.kafkaProducer = kafkaProducer;
+    }
+
+    public List<Container> getAll() {
         return containerRepository.findAll();
     }
 
@@ -42,32 +46,30 @@ public class ContainerService {
                     existingContainer.setOwner(updatedContainer.getOwner());
                     existingContainer.setDestination(updatedContainer.getDestination());
                     existingContainer.setOrigin(updatedContainer.getOrigin());
+                    existingContainer.setStatus(updatedContainer.getStatus());
+                    existingContainer.setMovementDate(updatedContainer.getMovementDate());
                     return containerRepository.save(existingContainer);
                 })
                 .orElseThrow(() -> new IllegalArgumentException("ID does not exist"));
     }
 
     public boolean deleteContainer(Long id) {
-        if(containerRepository.existsById(id)) {
+        if (containerRepository.existsById(id)) {
             containerRepository.deleteById(id);
             return true;
         }
         return false;
     }
 
-    public List<Container> search(String containerType, String owner, String origin, String destination) {
-        return containerRepository.searchContainers(containerType, owner, origin, destination);
+    public List<Container> search(
+            String containerType,
+            String owner,
+            String origin,
+            String destination,
+            ContainerStatus status,
+            LocalDate date
+    ) {
+        return containerRepository.searchContainer(containerType, owner, origin, destination, status, date);
     }
-
-//    public boolean  deleteContainer(Long id) {
-//        Container foundContainer = containerRepository.findById(id).orElse(null);
-//        if (foundContainer != null) {
-//            containerRepository.delete(foundContainer);
-//            return true;
-//        }
-//        return false;
-//    }
-
-
-
 }
+

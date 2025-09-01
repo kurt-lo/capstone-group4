@@ -1,12 +1,14 @@
 package com.capstone.cargo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.capstone.cargo.enums.ContainerStatus;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
 
 @Entity
 @Data
@@ -21,6 +23,12 @@ public class Container {
     private String owner;
     private String origin;
     private String destination;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ContainerStatus status;
+
+    private LocalDate movementDate;
 }
 
 
