@@ -246,41 +246,41 @@ public class ContainerServiceTest {
     }
 
     @Test
-    void test_givenValidDateRange_whenGetContainersByDayRange_thenReturnContainerList() {
+    void test_givenValidDateRange_whenGetContainersForReport_thenReturnContainerList() {
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = LocalDateTime.now();
 
-        when(containerRepository.findByDate(1L, startDate, endDate)).thenReturn(List.of(container, container2));
+        when(containerRepository.findByOrigin(1L, startDate, endDate)).thenReturn(List.of(container, container2));
 
-        List<ContainerDTO> containers = containerService.getContainersByDayRange(1L, startDate, endDate);
+        List<ContainerDTO> containers = containerService.getContainersForReport(1L, startDate, endDate);
 
         assertNotNull(containers);
         assertEquals(2, containers.size());
-        verify(containerRepository, times(1)).findByDate(1L, startDate, endDate);
+        verify(containerRepository, times(1)).findByOrigin(1L, startDate, endDate);
     }
 
     @Test
-    void test_givenValidDateRangeNoContainer_whenGetContainersByDayRange_thenReturnEmptyList() {
+    void test_givenValidDateRangeNoContainer_whenGetContainersForReport_thenReturnEmptyList() {
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = LocalDateTime.now();
 
-        when(containerRepository.findByDate(3L, startDate, endDate)).thenReturn(Collections.emptyList());
+        when(containerRepository.findByOrigin(3L, startDate, endDate)).thenReturn(Collections.emptyList());
 
-        List<ContainerDTO> containers = containerService.getContainersByDayRange(3L, startDate, endDate);
+        List<ContainerDTO> containers = containerService.getContainersForReport(3L, startDate, endDate);
 
         assertNotNull(containers);
-        verify(containerRepository, times(1)).findByDate(3L, startDate, endDate);
+        verify(containerRepository, times(1)).findByOrigin(3L, startDate, endDate);
     }
 
     @Test
-    void test_givenInvalidDateRange_whenGetContainersByDayRange_thenReturnEmptyList() {
+    void test_givenInvalidDateRange_whenGetContainersForReport_thenReturnEmptyList() {
         LocalDateTime startDate = null;
         LocalDateTime endDate = null;
 
-        List<ContainerDTO> containers = containerService.getContainersByDayRange(null, startDate, endDate);
+        List<ContainerDTO> containers = containerService.getContainersForReport(null, startDate, endDate);
 
         assertTrue(containers.isEmpty());
-        verify(containerRepository, never()).findByDate(4L, startDate, endDate);
+        verify(containerRepository, never()).findByOrigin(4L, startDate, endDate);
     }
 
 }

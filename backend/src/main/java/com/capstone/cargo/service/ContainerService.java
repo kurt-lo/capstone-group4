@@ -60,20 +60,68 @@ public class ContainerService {
         return containerRepository.findByContainerId(id)
                 .map(ContainerDTOMapper::mapContainerDTO)
                 .or(() -> {
-                    ;
                     log.error("Container retrieval failed: Container ID: {} not found", id);
                     throw new ContainerNotFoundException("Container ID: " + id + " not found");
                 });
     }
 
-    public List<ContainerDTO> getContainersByDayRange(Long locationId, LocalDateTime startDate, LocalDateTime endDate) {
-        if (isDateRangeValid(locationId, startDate, endDate)) return Collections.emptyList();
+    public List<ContainerDTO> getContainersForReport(Long originId, Long destinationId, LocalDateTime startDate, LocalDateTime endDate, String username, String role) {
+        if (isInvalidDate(startDate, endDate)) return Collections.emptyList();
 
-        return containerRepository.findByDate(locationId, startDate, endDate)
-                .stream().filter(Objects::nonNull)
+        List<Container> container;
+
+        if ("ROLE_ADMIN".equals(role)) {
+
+            if (originId != null && destinationId != null) {
+                 container = containerRepository.findByOriginAndDestination(originId, destinationId, startDate, endDate);
+                return container.stream()
+                        .map(ContainerDTOMapper::mapContainerDTO)
+                        .toList();
+
+            } else if (originId != null) {
+                container  = containerRepository.findByOrigin(originId, startDate, endDate);
+                return container.stream()
+                        .map(ContainerDTOMapper::mapContainerDTO)
+                        .toList();
+
+            } else if (destinationId != null) {
+                container = containerRepository.findByDestination(destinationId, startDate, endDate);
+                return container.stream()
+                        .map(ContainerDTOMapper::mapContainerDTO)
+                        .toList();
+            } else {
+                container = containerRepository.findByDateRange(startDate, endDate);
+                return container.stream()
+                        .map(ContainerDTOMapper::mapContainerDTO)
+                        .toList();
+            }
+        } else {
+            if (originId != null && destinationId != null) {
+                container = containerRepository.findByOriginAndDestinationForUser(username, originId, destinationId, startDate, endDate);
+
+            } else if (originId != null) {
+                container = containerRepository.findByOriginForUser(username, originId, startDate, endDate);
+                return container.stream()
+                        .map(ContainerDTOMapper::mapContainerDTO)
+                        .toList();
+
+            } else if (destinationId != null) {
+                container = containerRepository.findByDestinationForUser(username, destinationId, startDate, endDate);
+                return container.stream()
+                        .map(ContainerDTOMapper::mapContainerDTO)
+                        .toList();
+            } else {
+                container = containerRepository.findByDateRangeForUser(username, startDate, endDate);
+                return container.stream()
+                        .map(ContainerDTOMapper::mapContainerDTO)
+                        .toList();
+            }
+        }
+        return container.stream()
                 .map(ContainerDTOMapper::mapContainerDTO)
                 .toList();
     }
+
 
     public ContainerDTO createContainer(ContainerDTO containerDTO, String username) {
         Container container = mapContainer(containerDTO);
@@ -99,8 +147,8 @@ public class ContainerService {
         log.info("Container deletion successful: Container ID: {}", id);
     }
 
-    private static boolean isDateRangeValid(Long locationId, LocalDateTime startDate, LocalDateTime endDate) {
-        return locationId == null || startDate == null || endDate == null;
+    private static boolean isInvalidDate(LocalDateTime startDate, LocalDateTime endDate) {
+        return startDate == null || endDate == null || endDate.isBefore(startDate) || startDate.isAfter(endDate);
     }
 
     public List<Container> search(
