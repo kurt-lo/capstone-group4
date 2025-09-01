@@ -14,7 +14,11 @@ public class ContainerDTO {
     private Long containerId;
     private String containerType;
     private Long origin;
+    private String origin_city;
+    private String origin_country;
     private Long destination;
+    private String destination_city;
+    private String destination_country;
     private BigDecimal weight;
     private String containerSize;
     private LocalDateTime departureDate;

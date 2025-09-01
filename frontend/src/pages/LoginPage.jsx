@@ -1,41 +1,62 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import useAuthStore from "../authentication/useAuthStore";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import useAuthStore, { ONE_DAY } from "../authentication/useAuthStore";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");//setters getters
+  const location = useLocation();
+
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("user");
+
   const login = useAuthStore((state) => state.login);
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/admin")) {
+      setRole("admin");
+    } else {
+      setRole("user");
+    }
+  }, [location.pathname]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:9090/api/user/login' ,{
+      const endpoint =
+        role === "admin"
+          ? "http://localhost:9090/api/admin/login"
+          : "http://localhost:9090/api/user/login";
+
+      const response = await axios.post(endpoint, {
         username,
-        password
+        password,
       });
 
       const data = await response.data;
-      const userData = data.username;
-      const authToken = data.token;
-      console.log('');
+      // const userData = data.username;
+      // const authToken = data.token;
+      console.log("");
 
-      login(userData, authToken);
-      localStorage.setItem("authUserToken", data.token);
+      const userData = { username: data.username, role };
+      login(userData, data.token);
 
-      toast.success('Login success!');
+      Cookies.set("authUserToken", data.token, { expires: ONE_DAY });
+      Cookies.set("authUserRole", role, { expires: ONE_DAY });
+      Cookies.set("authUserName", data.username, { expires: ONE_DAY });
 
-      // navigate("/dashboard");
-      
+      toast.success("Login success!");
+
+      navigate(role === "admin" ? "/admin/dashboard" : "/dashboard");
     } catch (err) {
       console.error(err);
-      toast.error('Invalid Email or Password!');
+      toast.error("Invalid Email or Password!");
     } finally {
       setLoading(false);
     }
@@ -45,7 +66,7 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-300">
       <div className="w-full max-w-sm rounded-xl bg-[#EAF4F6] p-8 shadow-lg">
         <h1 className="mb-6 text-4xl font-bold text-gray-700">
-          welcome<span className="text-gray-700">!</span>
+          Welcome {role === "admin" ? "Admin" : "User"}!
         </h1>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -65,11 +86,12 @@ function LoginPage() {
           />
 
           <div className="flex items-center justify-between pt-2">
-            
-            // lagay na lang si signup dito pag tapos
-            <a href="#" className="text-sm text-gray-600 hover:underline">
-              sign up!
-            </a>
+            <Link
+              className="text-sm text-gray-600 hover:underline"
+              to={`/${role}/register`}
+            >
+              Sign up!
+            </Link>
             <button
               type="submit"
               disabled={loading}
