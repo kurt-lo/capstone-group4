@@ -33,7 +33,7 @@ public class AdminController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> loginUser(@RequestBody AuthLoginDto authLoginDto) {
-        JwtResponseDto jwtResponseDto = authService.login(authLoginDto);
+        JwtResponseDto jwtResponseDto = authService.login(authLoginDto, Role.ADMIN);
         log.info("Admin logged in successfully: {}", authLoginDto.getUsername());
         return new ResponseEntity<>(jwtResponseDto, HttpStatus.OK);
     }

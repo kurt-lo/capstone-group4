@@ -37,7 +37,7 @@ public class ContainerDTOMapper {
 
     public static Container mapContainer(ContainerDTO containerDTO) {
         Container container = new Container();
-        
+
         if(containerDTO.getContainerId() != null) {
             container.setContainerId(containerDTO.getContainerId());
         }

@@ -107,8 +107,8 @@ const Containers = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600">Container Number</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="containerNumber"
                   value={newContainer.containerNumber}
                   onChange={handleInputChange}
@@ -129,8 +129,8 @@ const Containers = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600">Status</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="status"
                   value={newContainer.status}
                   onChange={handleInputChange}
@@ -176,8 +176,8 @@ const Containers = () => {
                 </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600">Weight</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="weight"
                   value={newContainer.weight}
                   onChange={handleInputChange}
@@ -205,8 +205,7 @@ const Containers = () => {
               </button>
             </form>
           </div>
-          
-          
+
           {/* Container List Section */}
           <div className="md:col-span-2 bg-white p-6 rounded-3xl shadow-2xl border-2 border-indigo-200">
             <div className="flex justify-between items-center mb-6">
