@@ -25,7 +25,7 @@ function Navbar() {
           className="btn btn-ghost normal-case text-2xl font-extrabold tracking-tight hover:bg-primary/10 transition"
         >
           <Package className="size-6 text-primary" />
-          <span className="ml-2">CargoTrack</span>
+          <span className="ml-2">ContainerTrack</span>
         </Link>
         <div className="hidden md:flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-base-200/80 border border-base-300">
           <ShieldCheck className="size-4 text-success" />

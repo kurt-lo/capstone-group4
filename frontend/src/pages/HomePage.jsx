@@ -34,7 +34,7 @@ export default function HomePage() {
           <motion.div {...fade} className="grid md:grid-cols-2 gap-10 items-center">
             <div>
               <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">
-                Welcome to <span className="text-primary">CargoTrack</span>
+                Welcome to <span className="text-primary">ContainerTrack</span>
               </h1>
               <p className="mt-4 text-base-content/70 max-w-2xl">
                 Your central hub for container visibility. This is a static preview dashboard — plug in data later. Explore partners, quick actions, and upcoming features.
@@ -221,7 +221,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="footer footer-center p-6 bg-base-100 text-base-content border-t border-base-300">
         <aside>
-          <p className="text-sm">© {new Date().getFullYear()} CargoTrack • Static Welcome Dashboard</p>
+          <p className="text-sm">© {new Date().getFullYear()} ContainerTrack • Static Welcome Dashboard</p>
         </aside>
       </footer>
     </div>
