@@ -16,11 +16,11 @@ public class ContainerDTOMapper {
         containerDTO.setContainerId(container.getContainerId());
         containerDTO.setContainerType(container.getContainerType());
         containerDTO.setOrigin(container.getOrigin().getCityId());
-        containerDTO.setOrigin_city(container.getOrigin() != null ? container.getOrigin().getCityName() : null );
-        containerDTO.setOrigin_country(container.getOrigin().getCountry() != null  ? container.getOrigin().getCountry().getCountryName() : null );
+        containerDTO.setOriginCity(container.getOrigin() != null ? container.getOrigin().getCityName() : null);
+        containerDTO.setOriginCountry(container.getOrigin().getCountry() != null ? container.getOrigin().getCountry().getCountryName() : null);
         containerDTO.setDestination(container.getDestination().getCityId());
-        containerDTO.setDestination_city(container.getDestination() != null  ? container.getDestination().getCityName() : null );
-        containerDTO.setDestination_country(container.getDestination().getCountry() != null ? container.getDestination().getCountry().getCountryName() : null );
+        containerDTO.setDestinationCity(container.getDestination() != null ? container.getDestination().getCityName() : null);
+        containerDTO.setDestinationCountry(container.getDestination().getCountry() != null ? container.getDestination().getCountry().getCountryName() : null);
         containerDTO.setWeight(container.getWeight());
         containerDTO.setContainerSize(container.getContainerSize());
         containerDTO.setDepartureDate(container.getDepartureDate());
@@ -33,26 +33,8 @@ public class ContainerDTOMapper {
         return containerDTO;
     }
 
-    public static Container mapContainer(ContainerDTO containerDTO) {
-        Container container = new Container();
-
-        if(containerDTO.getContainerId() != null) {
-            container.setContainerId(containerDTO.getContainerId());
-        }
-
-        container.setContainerType(containerDTO.getContainerType());
-        container.setOrigin(cityBuilder(containerDTO.getOrigin()));
-        container.setDestination(cityBuilder(containerDTO.getDestination()));
-        container.setWeight(containerDTO.getWeight());
-        container.setContainerSize(containerDTO.getContainerSize());
-        container.setDepartureDate(containerDTO.getDepartureDate());
-        container.setArrivalDate(containerDTO.getArrivalDate());
-
-        return container;
-    }
-
-    public static Container updateContainerByDTO(Container container, ContainerDTO containerDTO) {
-        if(containerDTO.getContainerId() != null) {
+    public static Container mapContainer(Container container, ContainerDTO containerDTO) {
+        if (containerDTO.getContainerId() != null) {
             container.setContainerId(containerDTO.getContainerId());
         }
         container.setContainerType(containerDTO.getContainerType());

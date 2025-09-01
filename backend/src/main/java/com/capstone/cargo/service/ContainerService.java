@@ -28,7 +28,7 @@ public class ContainerService {
     private KafkaProducer kafkaProducer;
 
     public ContainerDTO publishKafkaMessage(ContainerDTO containerDTO) {
-        Container container = mapContainer(containerDTO);
+        Container container = mapContainer(new Container(), containerDTO);
         kafkaProducer.sendMessage(container);
         Container saved = containerRepository.save(container);
         return mapContainerDTO(saved);
@@ -60,7 +60,6 @@ public class ContainerService {
         return containerRepository.findByContainerId(id)
                 .map(ContainerDTOMapper::mapContainerDTO)
                 .or(() -> {
-                    ;
                     log.error("Container retrieval failed: Container ID: {} not found", id);
                     throw new ContainerNotFoundException("Container ID: " + id + " not found");
                 });
@@ -76,7 +75,7 @@ public class ContainerService {
     }
 
     public ContainerDTO createContainer(ContainerDTO containerDTO, String username) {
-        Container container = mapContainer(containerDTO);
+        Container container = mapContainer(new Container(), containerDTO);
         container.setCreatedBy(username);
         Container saved = containerRepository.save(container);
         return mapContainerDTO(saved);
@@ -86,7 +85,7 @@ public class ContainerService {
         Container existingContainer = containerRepository.findByContainerId(id)
                 .orElseThrow(() -> new ContainerNotFoundException("Container ID: " + id + " not found"));
 
-        Container saved = containerRepository.save(updateContainerByDTO(existingContainer, containerDTO));
+        Container saved = containerRepository.save(mapContainer(existingContainer, containerDTO));
         return mapContainerDTO(saved);
     }
 
