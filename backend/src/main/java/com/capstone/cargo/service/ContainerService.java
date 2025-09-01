@@ -36,21 +36,11 @@ public class ContainerService {
 
     public List<ContainerDTO> getAllContainers(String username, String role) {
         if ("ROLE_ADMIN".equals(role)) {
-            List<Container> allContainers = containerRepository.findAll();
-            if (allContainers.isEmpty()) {
-                log.error("No containers found in the database");
-                throw new ContainerNotFoundException("No containers found");
-            }
-            return allContainers.stream()
+            return containerRepository.findAll().stream()
                     .map(ContainerDTOMapper::mapContainerDTO)
                     .toList();
         } else {
-            List<Container> userContainers = containerRepository.findByCreatedBy(username);
-            if (userContainers.isEmpty()) {
-                log.error("No containers found for user: {}", username);
-                throw new ContainerNotFoundException("No containers found for user: " + username);
-            }
-            return userContainers.stream()
+            return containerRepository.findByCreatedBy(username).stream()
                     .map(ContainerDTOMapper::mapContainerDTO)
                     .toList();
         }
