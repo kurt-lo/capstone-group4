@@ -13,7 +13,7 @@ public class KafkaProducer {
     private static final String TOPIC = "cargo-events";
 
     public void sendMessage(Container container) {
-        kafkaTemplate.send(TOPIC, String.valueOf(container.getId()), container).whenComplete((result, e) -> {
+        kafkaTemplate.send(TOPIC, String.valueOf(container.getContainerId()), container).whenComplete((result, e) -> {
             if (e == null) {
                 System.out.println("Message sent: " + container + " " +
                          "| partition=" + result.getRecordMetadata().partition() +
