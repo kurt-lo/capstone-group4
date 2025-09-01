@@ -76,9 +76,8 @@ public class ContainerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteContainer(@PathVariable Long id){
-        return containerService.deleteContainer(id) ?
-                new ResponseEntity<>("Container deleted", HttpStatus.OK)
-                : new ResponseEntity<>("Container not found", HttpStatus.NOT_FOUND);
+        containerService.deleteContainer(id);
+        return new ResponseEntity<>("Container deleted", HttpStatus.OK);
     }
 }
  
