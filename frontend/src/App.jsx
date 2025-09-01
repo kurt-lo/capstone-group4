@@ -6,7 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Profile from "./components/Profile";
+import Profile from "./pages/ProfilePage";
 import ReportsPage from "./pages/ReportsPage";
 
 function App() {
