@@ -6,6 +6,9 @@ const ContainerSearch = () => {
     owner: '',
     origin: '',
     destination: '',
+    startDate: '',
+    endDate: '',
+    status: '',
   });
 
   const [results, setResults] = useState([]);
@@ -28,7 +31,9 @@ const ContainerSearch = () => {
     );
 
     try {
-      const res = await fetch(`http://localhost:9090/api/containers/search?${queryParams}`);
+      const res = await fetch(
+        `http://localhost:9090/api/containers/search?${queryParams}`
+      );
       if (!res.ok) throw new Error('Fetch failed');
       const data = await res.json();
       setResults(data);
@@ -40,7 +45,7 @@ const ContainerSearch = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4">Container Search</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-wrap gap-4 mb-6">
@@ -48,7 +53,7 @@ const ContainerSearch = () => {
           type="text"
           name="containerType"
           placeholder="Container Type"
-          className="input input-bordered w-full md:w-48"
+          className="input input-bordered w-full md:w-40"
           value={filters.containerType}
           onChange={handleChange}
         />
@@ -56,7 +61,7 @@ const ContainerSearch = () => {
           type="text"
           name="owner"
           placeholder="Owner"
-          className="input input-bordered w-full md:w-48"
+          className="input input-bordered w-full md:w-40"
           value={filters.owner}
           onChange={handleChange}
         />
@@ -64,7 +69,7 @@ const ContainerSearch = () => {
           type="text"
           name="origin"
           placeholder="Origin"
-          className="input input-bordered w-full md:w-48"
+          className="input input-bordered w-full md:w-40"
           value={filters.origin}
           onChange={handleChange}
         />
@@ -72,15 +77,45 @@ const ContainerSearch = () => {
           type="text"
           name="destination"
           placeholder="Destination"
-          className="input input-bordered w-full md:w-48"
+          className="input input-bordered w-full md:w-40"
           value={filters.destination}
           onChange={handleChange}
         />
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={loading}
+
+        {/* Start Date */}
+        <input
+          type="date"
+          name="startDate"
+          className="input input-bordered w-full md:w-40"
+          value={filters.startDate}
+          onChange={handleChange}
+        />
+
+        {/* End Date */}
+        <input
+          type="date"
+          name="endDate"
+          className="input input-bordered w-full md:w-40"
+          value={filters.endDate}
+          onChange={handleChange}
+        />
+
+        {/* Status Dropdown */}
+        <select
+          name="status"
+          className="select select-bordered w-full md:w-40"
+          value={filters.status}
+          onChange={handleChange}
         >
+          <option value="">All Status</option>
+          <option value="DISCHARGED">DISCHARGED</option>
+          <option value="OPEN">OPEN</option>
+          <option value="LOADED">LOADED</option>
+          <option value="RECEIVED">RECEIVED</option>
+          <option value="IN_TRANSIT">IN_TRANSIT</option>
+        </select>
+
+        <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? 'Searching...' : 'Search'}
         </button>
       </form>
@@ -97,6 +132,7 @@ const ContainerSearch = () => {
                 <th>Owner</th>
                 <th>Origin</th>
                 <th>Destination</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -107,6 +143,7 @@ const ContainerSearch = () => {
                   <td>{c.owner}</td>
                   <td>{c.origin}</td>
                   <td>{c.destination}</td>
+                  <td>{c.status}</td>
                 </tr>
               ))}
             </tbody>
