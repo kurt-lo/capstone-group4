@@ -2,10 +2,8 @@ package com.capstone.cargo.mapper;
 
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.model.Container;
-import com.capstone.cargo.model.Location;
 
 import static com.capstone.cargo.mapper.MapperDTOUtils.cityBuilder;
-import static com.capstone.cargo.mapper.MapperDTOUtils.locationBuilder;
 
 public class ContainerDTOMapper {
 
@@ -35,9 +33,7 @@ public class ContainerDTOMapper {
         return containerDTO;
     }
 
-    public static Container mapContainer(ContainerDTO containerDTO) {
-        Container container = new Container();
-
+    public static Container mapContainer(Container container, ContainerDTO containerDTO) {
         if(containerDTO.getContainerId() != null) {
             container.setContainerId(containerDTO.getContainerId());
         }
@@ -57,6 +53,7 @@ public class ContainerDTOMapper {
         if(containerDTO.getContainerId() != null) {
             container.setContainerId(containerDTO.getContainerId());
         }
+
         container.setContainerType(containerDTO.getContainerType());
         container.setOrigin(cityBuilder(containerDTO.getOrigin()));
         container.setDestination(cityBuilder(containerDTO.getDestination()));

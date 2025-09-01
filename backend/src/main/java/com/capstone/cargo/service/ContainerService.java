@@ -3,7 +3,6 @@ package com.capstone.cargo.service;
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.mapper.ContainerDTOMapper;
 import com.capstone.cargo.model.Container;
-import com.capstone.cargo.enums.TrackingEventTypes;
 import com.capstone.cargo.producer.KafkaProducer;
 import com.capstone.cargo.repository.ContainerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +42,11 @@ public class ContainerService {
                     .toList();
         }
     }
+    public Container addContainer(Container container) {
+        Container newContainer = containerRepository.save(container);
+        kafkaProducer.sendMessage(newContainer);
+        return newContainer;
+    }
 
     public Optional<ContainerDTO> getContainerById(Long id) {
         return containerRepository.findByContainerId(id)
@@ -57,10 +61,9 @@ public class ContainerService {
                 .map(ContainerDTOMapper::mapContainerDTO)
                 .toList();
     }
+    public ContainerDTO createContainer(ContainerDTO containerDTO) {
+        Container container = mapContainer(new Container(), containerDTO);
 
-    public ContainerDTO createContainer(ContainerDTO containerDTO, String username) {
-        Container container = mapContainer(containerDTO);
-        container.setCreatedBy(username);
         Container saved = containerRepository.save(container);
         return mapContainerDTO(saved);
     }
@@ -69,7 +72,7 @@ public class ContainerService {
         Container existingContainer = containerRepository.findByContainerId(id)
                 .orElseThrow(() -> new IllegalArgumentException("ID does not exist"));
 
-        Container saved = containerRepository.save(updateContainerByDTO(existingContainer, containerDTO));
+        Container saved = containerRepository.save(mapContainer(existingContainer, containerDTO));
         return mapContainerDTO(saved);
     }
 

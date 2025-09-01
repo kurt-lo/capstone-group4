@@ -1,5 +1,9 @@
 package com.capstone.cargo.controller;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.dto.ContainerDTO;
 import com.capstone.cargo.service.ContainerService;
 import jakarta.validation.Valid;
@@ -12,8 +16,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.capstone.cargo.model.Container;
+import com.capstone.cargo.service.ContainerService;
 
 @RestController
 @RequestMapping ("/api/containers")
@@ -22,7 +26,7 @@ public class ContainerController {
 
     @Autowired
     private ContainerService containerService;
-
+    
     @GetMapping
     public ResponseEntity<List<ContainerDTO>> getContainers() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

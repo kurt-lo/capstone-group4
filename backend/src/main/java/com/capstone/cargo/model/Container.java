@@ -1,6 +1,5 @@
 package com.capstone.cargo.model;
 
-import com.capstone.cargo.enums.TrackingEventTypes;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,10 +44,6 @@ public class Container extends BaseEntity {
 
     @Column(name = "ARRIVAL_DATE")
     private LocalDateTime arrivalDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TrackingEventTypes status;
 }
 
 

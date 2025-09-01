@@ -24,14 +24,11 @@ public interface ContainerRepository extends JpaRepository<Container, Long> {
     @Query("SELECT c FROM Container c " +
             "WHERE (:containerType IS NULL OR c.containerType = :containerType) " +
             "AND (:originId IS NULL OR c.origin.cityId = :originId) " +
-            "AND (:destinationId IS NULL OR c.destination.cityId = :destinationId) " +
-            "AND (:status IS NULL OR c.status = :status)")
+            "AND (:destinationId IS NULL OR c.destination.cityId = :destinationId) ")
     List<Container> searchContainer(
             @Param("containerType") String containerType,
             @Param("originId") Long originId,
-            @Param("destinationId") Long destinationId,
-            @Param("status") TrackingEventTypes status
+            @Param("destinationId") Long destinationId
     );
 
 }
-

@@ -128,17 +128,6 @@ const Containers = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Status</label>
-                <input
-                  type="text"
-                  name="status"
-                  value={newContainer.status}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"
-                />
-              </div>
-              <div>
                 <label className="block text-sm font-medium text-gray-600">Origin</label>
                 <input 
                   type="text" 
