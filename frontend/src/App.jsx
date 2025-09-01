@@ -1,13 +1,13 @@
 import { Route, Routes } from "react-router";
 import "./App.css";
-import Home from "./components/Home";
 import Navbar from "./components/Navbar";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Profile from "./components/Profile";
 import ReportsPage from "./pages/ReportsPage";
+import HomePage from "./pages/HomePage";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
       <Navbar />
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/user/login" element={<LoginPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/user/register" element={<RegisterPage />} />
@@ -23,7 +23,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["USER", "ADMIN"]} />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/report" element={<ReportsPage />} />
         </Route>
       </Routes>
       {/* <Footer /> */}

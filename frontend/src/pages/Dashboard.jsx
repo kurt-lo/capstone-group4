@@ -239,10 +239,10 @@ function Dashboard() {
   if (error) return <div style={{ color: "crimson" }}>{error}</div>;
 
   return (
-    <div className="p-5 bg-gray-900 min-h-screen ">
-      {/* <Sidebar /> */}
+    <div className="flex bg-gray-900 min-h-screen ">
+      <Sidebar />
       {/* Layout Wrapper to allow squeezing */}
-      <div className="flex h-screen">
+      <div className="flex flex-1 h-screen items-center justify-center px-[2rem]">
         <div className="flex flex-col gap-6 w-full">
           <motion.div
             layout
@@ -638,7 +638,7 @@ function Dashboard() {
                   <h2 className="text-2xl font-bold">Add Container</h2>
                   <button
                     onClick={() => setIsModalOpen(false)}
-                    className="text-cyan-400 hover:text-cyan-200"
+                    className="text-cyan-400 hover:text-cyan-200 cursor-pointer"
                   >
                     ✕
                   </button>
@@ -744,7 +744,7 @@ function Dashboard() {
                   <div className="col-span-2 flex justify-end">
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-green-600 hover:bg-green-500 rounded-lg shadow-md text-white font-medium"
+                      className="px-6 py-2 bg-green-600 hover:bg-green-500 rounded-lg shadow-md text-white font-medium cursor-pointer"
                     >
                       Save Container
                     </button>
