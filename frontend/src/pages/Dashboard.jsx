@@ -297,189 +297,216 @@ function Dashboard() {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen text-white">Loading containers…</div>;
-  if (error) return <div className="flex items-center justify-center min-h-screen text-red-500">{error}</div>;
+  if (loading) return <div>Loading containers…</div>;
+  if (error) return <div style={{ color: "crimson" }}>{error}</div>;
 
   return (
-    <div className="flex lg:flex-row bg-gray-900 min-h-screen">
+    <div className="flex bg-gray-900 min-h-screen">
       <Sidebar />
-      
-      {/* Main Content */}
-      <div className="flex-1 p-2 sm:p-4 lg:p-6 overflow-x-hidden">
-        <div className="max-w-full">
-          
-          {/* Top Stats - Responsive Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-6 lg:mb-8">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-gradient-to-br from-cyan-500 to-blue-500 p-4 sm:p-6 rounded-2xl shadow-lg"
-            >
-              <h2 className="text-sm sm:text-lg">Total Containers</h2>
-              <p className="text-xl sm:text-3xl font-bold">{totalContainers}</p>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-gradient-to-br from-green-500 to-emerald-500 p-4 sm:p-6 rounded-2xl shadow-lg"
-            >
-              <h2 className="text-sm sm:text-lg">Total Weight</h2>
-              <p className="text-xl sm:text-3xl font-bold">{totalWeight} kg</p>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-gradient-to-br from-purple-500 to-pink-500 p-4 sm:p-6 rounded-2xl shadow-lg sm:col-span-2 lg:col-span-1"
-            >
-              <h2 className="text-sm sm:text-lg">Avg Weight</h2>
-              <p className="text-xl sm:text-3xl font-bold">{avgWeight} kg</p>
-            </motion.div>
-          </div>
-
-          {/* Charts - Stack on mobile, grid on larger screens */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-10">
-                        {/* PIE CHART */}
-            <div className="rounded-2xl border border-purple-500/40 shadow-lg shadow-purple-500/20 bg-white/5 backdrop-blur-md p-4 sm:p-6">
-              <h2 className="text-base lg:text-lg font-semibold mb-4 text-white">
-                Container Types
-              </h2>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={typeData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="45%"
-                    outerRadius={60}
-                    innerRadius={35}
-                    paddingAngle={5}
-                  >
-                    {typeData.map((_, i) => (
-                      <Cell
-                        key={i}
-                        fill={COLORS[i % COLORS.length]}
-                        stroke="none"
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: '1px solid #6366F1',
-                      borderRadius: '8px',
-                      color: '#000000'
-                    }}
-                    labelStyle={{ color: '#000000' }}
-                  />
-                  <Legend 
-                    verticalAlign="bottom"
-                    height={36}
-                    wrapperStyle={{
-                      paddingTop: '20px',
-                      fontSize: '12px'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+      {/* Layout Wrapper to allow squeezing */}
+      <div className="mt-15 flex flex-1 h-screen items-center justify-center px-1 lg:px-[2rem]">
+        <div className="flex flex-col gap-6 mt-[80%] pt-[10%] md:mt-[85%] lg:mt-[2%]">
+          <motion.div
+            layout
+            className={`mt-[1%] flex-1 flex flex-col gap-6 transition-all duration-500 `}
+          >
+            {/* Top Stats */}
+            <div className="grid grid-cols-3 grid-rows-1 gap-6 mb-8">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-gradient-to-br from-cyan-500 to-blue-500 p-6 rounded-2xl shadow-lg"
+              >
+                <h2 className="text-lg">Total Containers</h2>
+                <p className="text-3xl font-bold">{totalContainers}</p>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-gradient-to-br from-green-500 to-emerald-500 p-6 rounded-2xl shadow-lg"
+              >
+                <h2 className="text-lg">Total Weight</h2>
+                <p className="text-3xl font-bold">{totalWeight} kg</p>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-gradient-to-br from-purple-500 to-pink-500 p-6 rounded-2xl shadow-lg"
+              >
+                <h2 className="text-lg">Avg Weight</h2>
+                <p className="text-3xl font-bold">{avgWeight} kg</p>
+              </motion.div>
             </div>
 
-            {/* LINE CHART */}
-            <div className="rounded-2xl border border-cyan-500/40 shadow-lg shadow-cyan-500/20 bg-white/5 backdrop-blur-md p-4 sm:p-6">
-              <h2 className="text-base lg:text-lg font-semibold mb-4 text-white">
-                Weight Trend
-              </h2>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={weightData}>
-                  <defs>
-                    <linearGradient
-                      id="lineGradient"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+              {/* PIE CHART */}
+              <div className="rounded-2xl border border-purple-500/40 shadow-lg shadow-purple-500/20 bg-white/5 backdrop-blur-md p-6">
+                <h2 className="text-lg font-semibold mb-4 text-white">
+                  Container Types
+                </h2>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={typeData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={90}
+                      innerRadius={50}
+                      paddingAngle={5}
                     >
-                      <stop
-                        offset="5%"
-                        stopColor="#22D3EE"
-                        stopOpacity={0.9}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="#22D3EE"
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
-                  <YAxis stroke="#94a3b8" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: '1px solid #22D3EE',
-                      borderRadius: '8px',
-                      color: '#000000'
-                    }}
-                    labelStyle={{ color: '#000000' }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="weight"
-                    stroke="url(#lineGradient)"
-                    strokeWidth={3}
-                    dot={{ r: 5, fill: "#22D3EE" }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+                      {typeData.map((_, i) => (
+                        <Cell
+                          key={i}
+                          fill={COLORS[i % COLORS.length]}
+                          stroke="none"
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
 
-            {/* BAR CHART */}
-            <div className="rounded-2xl border border-pink-500/40 shadow-lg shadow-pink-500/20 bg-white/5 backdrop-blur-md p-4 sm:p-6">
-              <h2 className="text-base lg:text-lg font-semibold mb-4 text-white">
-                Container Sizes
-              </h2>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={containerSizeData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="origin" stroke="#94a3b8" fontSize={12} />
-                  <YAxis stroke="#94a3b8" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: '1px solid #22D3EE',
-                      borderRadius: '8px',
-                      color: '#000000'
-                    }}
-                    labelStyle={{ color: '#000000' }}
-                  />
-                  <Bar dataKey="size" radius={[8, 8, 0, 0]}>
-                    {containerSizeData.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+              {/* LINE CHART
+              <div className="rounded-2xl border border-cyan-500/40 shadow-lg shadow-cyan-500/20 bg-white/5 backdrop-blur-md p-6">
+                <h2 className="text-lg font-semibold mb-4 text-white">
+                  Weight Trend
+                </h2>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={weightData}>
+                    <defs>
+                      <linearGradient
+                        id="lineGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="#22D3EE"
+                          stopOpacity={0.9}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#22D3EE"
+                          stopOpacity={0.1}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="name" stroke="#94a3b8" />
+                    <YAxis stroke="#94a3b8" />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="weight"
+                      stroke="url(#lineGradient)"
+                      strokeWidth={3}
+                      dot={{ r: 5, fill: "#22D3EE" }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div> */}
 
-          {/* Container Table Section */}
-          <div className="flex flex-col xl:flex-row gap-4 lg:gap-6">
-            {/* Table Container */}
+              {/* LINE CHART */}
+              <div className="rounded-2xl border border-cyan-500/40 shadow-lg shadow-cyan-500/20 bg-white/5 backdrop-blur-md p-6">
+                <h2 className="text-lg font-semibold mb-4 text-white">
+                  Weight Trend
+                </h2>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={weightData}>
+                    <defs>
+                      <linearGradient
+                        id="lineGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="#22D3EE"
+                          stopOpacity={0.9}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#22D3EE"
+                          stopOpacity={0.1}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="name" stroke="#94a3b8" />
+                    <YAxis stroke="#94a3b8" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        border: '1px solid #22D3EE',
+                        borderRadius: '8px',
+                        color: '#000000'
+                      }}
+                      labelStyle={{ color: '#000000' }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="weight"
+                      stroke="url(#lineGradient)"
+                      strokeWidth={3}
+                      dot={{ r: 5, fill: "#22D3EE" }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* BAR CHART */}
+              <div className="rounded-2xl border border-pink-500/40 shadow-lg shadow-pink-500/20 bg-white/5 backdrop-blur-md p-6">
+                <h2 className="text-lg font-semibold mb-4 text-white">
+                  Container Sizes
+                </h2>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={containerSizeData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="origin" stroke="#94a3b8" />
+                    <YAxis stroke="#94a3b8" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        border: '1px solid #22D3EE',
+                        borderRadius: '8px',
+                        color: '#000000'
+                      }}
+                      labelStyle={{ color: '#000000' }}
+                    />
+                    <Bar dataKey="size" radius={[8, 8, 0, 0]}>
+                      {containerSizeData.map((_, i) => (
+                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            {/* Table + Title + Add Button */}
             <motion.div
               layout
-              className="flex-1 p-3 sm:p-5 rounded-2xl bg-gray-700/30 border border-cyan-700 shadow-[0_0_20px_2px_rgba(34,211,238,0.8)]"
+              animate={{ marginTop: selectedContainer ? 20 : 0 }}
+              transition={{ type: "spring", stiffness: 100, damping: 20 }}
+              className="flex-1 p-5 rounded-2xl border-1 bg-gray-700/30 border-cyan-700 shadow-[0_0_20px_2px_rgba(34,211,238,0.8)] overflow-x-auto"
             >
-              {/* Header with controls */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-                <h1 className="text-xl sm:text-2xl font-bold text-white">My Containers</h1>
+              {/* Title + Search + Button Row */}
+              <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+                <h1 className="text-2xl font-bold text-white">My Containers</h1>
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                <div className="flex items-center gap-4">
                   {/* Search Input */}
-                  <div className="relative flex-1 sm:flex-initial">
+                  <div className="relative">
                     <input
                       type="text"
                       placeholder="Search containers..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-cyan-400 text-sm"
+                      className="pl-10 pr-4 py-2 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-cyan-400"
                     />
                     <svg
                       className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"
@@ -500,7 +527,7 @@ function Dashboard() {
                   <select
                     value={itemsPerPage}
                     onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                    className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-cyan-400 text-sm"
+                    className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-cyan-400"
                   >
                     <option value={5}>5 per page</option>
                     <option value={10}>10 per page</option>
@@ -509,16 +536,15 @@ function Dashboard() {
                   </select>
 
                   <button
-                    onClick={() => setIsModalOpen(true)
-                    }
-                    className="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition cursor-pointer text-sm whitespace-nowrap"
+                    onClick={() => setIsModalOpen(true)}
+                    className="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition cursor-pointer"
                   >
                     Add Container
                   </button>
                 </div>
               </div>
 
-              {/* Table with horizontal scroll on mobile */}
+              {/* Table with Scrollbar */}
               {filteredContainers.length === 0 ? (
                 <div className="text-gray-400 text-center py-8">
                   {searchTerm
@@ -527,131 +553,141 @@ function Dashboard() {
                 </div>
               ) : (
                 <>
-                  <div className="overflow-x-auto">
-                    <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500 scrollbar-track-gray-700">
-                      <motion.table
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 30 }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        className="w-full table-auto text-left min-w-[800px]"
-                      >
-                        <thead className="sticky top-0 bg-gray-800/90 backdrop-blur-sm">
-                          <tr className="text-white">
-                            <th className="border-b border-gray-600 p-2 sm:p-4 text-xs sm:text-sm">Container ID</th>
-                            <th className="border-b border-gray-600 p-2 sm:p-4 text-xs sm:text-sm">Type</th>
-                            <th className="border-b border-gray-600 p-2 sm:p-4 text-xs sm:text-sm">Origin</th>
-                            <th className="border-b border-gray-600 p-2 sm:p-4 text-xs sm:text-sm">Destination</th>
-                            <th className="border-b border-gray-600 p-2 sm:p-4 text-xs sm:text-sm">Weight</th>
-                            <th className="border-b border-gray-600 p-2 sm:p-4 text-xs sm:text-sm">Size</th>
-                            <th className="border-b border-gray-600 p-2 sm:p-4 text-xs sm:text-sm">Departure</th>
-                            <th className="border-b border-gray-600 p-2 sm:p-4 text-xs sm:text-sm">Arrival</th>
-                            <th className="border-b border-gray-600 p-2 sm:p-4 text-xs sm:text-sm">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {currentContainers.map((container, index) => (
-                            <motion.tr
-                              key={container.containerId + index}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: index * 0.05, duration: 0.4 }}
-                              className="bg-gray-900/30 hover:bg-gray-800/40 transition-colors backdrop-blur-sm cursor-pointer"
-                              onClick={() => {
-                                setSelectedContainer(container);
-                                fetchTrackingEvents(container.containerId);
-                              }}
-                            >
-                              <td className="p-2 sm:p-4 border-b border-gray-700 text-white text-xs sm:text-sm">
-                                {container.containerId}
-                              </td>
-                              <td className="p-2 sm:p-4 border-b border-gray-700 text-white text-xs sm:text-sm">
-                                {container.containerType}
-                              </td>
-                              <td className="p-2 sm:p-4 border-b border-gray-700 text-white text-xs sm:text-sm">
-                                {container.originCity}, {container.originCountry}
-                              </td>
-                              <td className="p-2 sm:p-4 border-b border-gray-700 text-white text-xs sm:text-sm">
-                                {container.destinationCity}, {container.destinationCountry}
-                              </td>
-                              <td className="p-2 sm:p-4 border-b border-gray-700 text-white text-xs sm:text-sm">
-                                {container.weight}
-                              </td>
-                              <td className="p-2 sm:p-4 border-b border-gray-700 text-white text-xs sm:text-sm">
-                                {container.containerSize}
-                              </td>
-                              <td className="p-2 sm:p-4 border-b border-gray-700 text-white text-xs sm:text-sm">
-                                {formatDate(container.departureDate)}
-                              </td>
-                              <td className="p-2 sm:p-4 border-b border-gray-700 text-white text-xs sm:text-sm">
-                                {formatDate(container.arrivalDate)}
-                              </td>
-                              <td className="p-2 sm:p-4 border-b border-gray-700 text-white text-xs sm:text-sm">
-                                <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setIsUpdateModalOpen(true);
-                                      setSelectedContainer(container);
-                                      setFormData(container);
-                                    }}
-                                    className="px-2 py-1 bg-blue-600 hover:bg-blue-500 rounded text-xs transition"
-                                  >
-                                    Update
-                                  </button>
-                                  <button
-                                    className="px-2 py-1 bg-red-600 hover:bg-red-500 rounded text-xs transition"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      document.getElementById("my_modal_5").showModal();
-                                    }}
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              </td>
-                            </motion.tr>
-                          ))}
-                        </tbody>
-                      </motion.table>
-                    </div>
+                  <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500 scrollbar-track-gray-700">
+                    <motion.table
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 30 }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                      className="w-full table-auto text-left"
+                    >
+                      <thead className="sticky top-0 bg-gray-800/90 backdrop-blur-sm">
+                        <tr className="text-white">
+                          <th className="border-b border-gray-600 p-4">
+                            Container ID
+                          </th>
+                          <th className="border-b border-gray-600 p-4">Type</th>
+                          <th className="border-b border-gray-600 p-4">Origin</th>
+                          <th className="border-b border-gray-600 p-4">
+                            Destination
+                          </th>
+                          <th className="border-b border-gray-600 p-4">Weight</th>
+                          <th className="border-b border-gray-600 p-4">Size</th>
+                          <th className="border-b border-gray-600 p-4">
+                            Departure Date
+                          </th>
+                          <th className="border-b border-gray-600 p-4">
+                            Arrival Date
+                          </th>
+                          <th className="border-b border-gray-600 p-4">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentContainers.map((container, index) => (
+                          <motion.tr
+                            key={container.containerId + index}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05, duration: 0.4 }}
+                            className="bg-gray-900/30 hover:bg-gray-800/40 transition-colors backdrop-blur-sm cursor-pointer"
+                            onClick={() => {
+                              setSelectedContainer(container);
+                              fetchTrackingEvents(container.containerId);
+                            }}
+                          >
+                            <td className="p-4 border-b border-gray-700 text-white">
+                              {container.containerId}
+                            </td>
+                            <td className="p-4 border-b border-gray-700 text-white">
+                              {container.containerType}
+                            </td>
+                            <td className="p-4 border-b border-gray-700 text-white">
+                              {container.originCity}, {container.originCountry}
+                            </td>
+                            <td className="p-4 border-b border-gray-700 text-white">
+                              {container.destinationCity},{" "}
+                              {container.destinationCountry}
+                            </td>
+                            <td className="p-4 border-b border-gray-700 text-white">
+                              {container.weight}
+                            </td>
+                            <td className="p-4 border-b border-gray-700 text-white">
+                              {container.containerSize}
+                            </td>
+                            <td className="p-4 border-b border-gray-700 text-white">
+                              {formatDate(container.departureDate)}
+                            </td>
+                            <td className="p-4 border-b border-gray-700 text-white">
+                              {formatDate(container.arrivalDate)}
+                            </td>
+                            <td className="p-4 border-b border-gray-700 text-white">
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsUpdateModalOpen(true);
+                                    setSelectedContainer(container);
+                                    setFormData(container);
+                                  }}
+                                  className="px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded text-sm transition"
+                                >
+                                  Update
+                                </button>
+                                <button
+                                  className="px-3 py-1 bg-red-600 hover:bg-red-500 rounded text-sm transition"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    document.getElementById("my_modal_5").showModal();
+                                  }}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </tbody>
+                    </motion.table>
                   </div>
 
-                  {/* Pagination Controls - Mobile friendly */}
+                  {/* Pagination Controls */}
                   <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                    <div className="text-xs sm:text-sm text-gray-400 text-center sm:text-left">
-                      Showing {startIndex + 1} to {Math.min(endIndex, filteredContainers.length)} of {filteredContainers.length} containers
+                    <div className="text-sm text-gray-400">
+                      Showing{" "}
+                      {startIndex + 1} to{" "}
+                      {Math.min(endIndex, filteredContainers.length)} of{" "}
+                      {filteredContainers.length} containers
                     </div>
 
-                    <div className="flex items-center space-x-1 sm:space-x-2">
+                    <div className="flex items-center space-x-2">
                       <button
                         onClick={goToPrevious}
                         disabled={currentPage === 1}
                         className="p-2 rounded-lg border border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors text-white"
                       >
-                        <ChevronLeft size={14} />
+                        <ChevronLeft size={16} />
                       </button>
 
                       <div className="flex space-x-1">
-                        {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => {
+                        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                           let pageNumber;
-                          if (totalPages <= 3) {
+                          if (totalPages <= 5) {
                             pageNumber = i + 1;
-                          } else if (currentPage <= 2) {
+                          } else if (currentPage <= 3) {
                             pageNumber = i + 1;
-                          } else if (currentPage >= totalPages - 1) {
-                            pageNumber = totalPages - 2 + i;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNumber = totalPages - 4 + i;
                           } else {
-                            pageNumber = currentPage - 1 + i;
+                            pageNumber = currentPage - 2 + i;
                           }
 
                           return (
                             <button
                               key={pageNumber}
                               onClick={() => goToPage(pageNumber)}
-                              className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm transition-colors ${currentPage === pageNumber
-                                  ? "bg-cyan-600 text-white"
-                                  : "border border-gray-600 text-white hover:bg-gray-700"
+                              className={`px-3 py-1 rounded-lg text-sm transition-colors ${currentPage === pageNumber
+                                ? "bg-cyan-600 text-white"
+                                : "border border-gray-600 text-white hover:bg-gray-700"
                                 }`}
                             >
                               {pageNumber}
@@ -665,7 +701,7 @@ function Dashboard() {
                         disabled={currentPage === totalPages}
                         className="p-2 rounded-lg border border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors text-white"
                       >
-                        <ChevronRight size={14} />
+                        <ChevronRight size={16} />
                       </button>
                     </div>
                   </div>
@@ -713,7 +749,8 @@ function Dashboard() {
                 </div>
               </dialog>
             </motion.div>
-          </div>
+          </motion.div>
+        </div>
 
         {/* Details Card */}
         <AnimatePresence>
@@ -1040,12 +1077,10 @@ function Dashboard() {
               </motion.div>
             </motion.div>
           )}
-        </AnimatePresence
-        >
+        </AnimatePresence>
       </div>
     </div>
-    </div>
   );
-};
+}
 
 export default Dashboard;
