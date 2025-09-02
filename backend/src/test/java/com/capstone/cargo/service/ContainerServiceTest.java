@@ -13,6 +13,8 @@ import com.capstone.cargo.role.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -21,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -53,10 +56,18 @@ public class ContainerServiceTest {
 
     private User user, admin;
 
-    private ContainerDTO inputDto, outputDto;
+    private LocalDateTime startDate, endDate;
 
     @BeforeEach
     public void setUp() {
+
+        manila = new City();
+        manila.setCityId(1L);
+        manila.setCityName("Manila");
+
+        cebu = new City();
+        cebu.setCityId(2L);
+        cebu.setCityName("Cebu");
 
         container = new Container();
         container.setContainerId(1L);
@@ -65,6 +76,7 @@ public class ContainerServiceTest {
         container.setDestination(cebu); //100005,"Cebu","PH"
         container.setWeight(BigDecimal.ONE);
         container.setCreatedBy("username");
+        container.setCreateDate(LocalDateTime.now());
 
         container2 = new Container();
         container2.setContainerId(2L);
@@ -73,6 +85,7 @@ public class ContainerServiceTest {
         container2.setDestination(manila);
         container2.setWeight(BigDecimal.ONE);
         container2.setCreatedBy("anotherUser");
+        container2.setCreateDate(LocalDateTime.now());
 
         container1 = new Container();
         container1.setContainerId(3L);
@@ -94,6 +107,9 @@ public class ContainerServiceTest {
         admin = new User();
         admin.setUsername("admin");
         admin.setRole(Role.ADMIN);
+
+        startDate = LocalDateTime.now();
+        endDate = LocalDateTime.now();
     }
 
     @Test
@@ -187,13 +203,20 @@ public class ContainerServiceTest {
 
     @Test
     void test_givenValidContainer_whenCreateContainer_thenReturnContainer() {
-        when(containerRepository.save(container)).thenReturn(container);
+        when(containerRepository.save(any(Container.class))).thenAnswer(invocation -> {
+            Container saved = invocation.getArgument(0);
+            saved.setContainerId(1L);
+            return saved;
+        });
 
-        ContainerDTO createdContainer = containerService.createContainer(ContainerDTOMapper.mapContainerDTO(container), user.getUsername());
+        ContainerDTO createdContainer = containerService.createContainer(
+                ContainerDTOMapper.mapContainerDTO(container),
+                "username"
+        );
 
         assertNotNull(createdContainer);
         assertEquals("username", createdContainer.getCreatedBy());
-        verify(containerRepository, times(1)).save(container);
+        verify(containerRepository, times(1)).save(any(Container.class));
     }
 
     @Test
@@ -245,42 +268,103 @@ public class ContainerServiceTest {
         verify(containerRepository, times(0)).deleteById(4L);
     }
 
-    @Test
-    void test_givenValidDateRange_whenGetContainersForReport_thenReturnContainerList() {
-        LocalDateTime startDate = LocalDateTime.now();
-        LocalDateTime endDate = LocalDateTime.now();
+    @ParameterizedTest
+    @CsvSource({
+            "ROLE_ADMIN, 1, 2, 2",   // admin with origin + destination → expect 2 containers
+            "ROLE_ADMIN, 1, , 1",    // admin with origin only → expect 1
+            "ROLE_ADMIN, , 2, 1",    // admin with destination only → expect 1
+            "ROLE_ADMIN, , , 1",     // admin with no filters → expect 1
+            "ROLE_USER, 1, 2, 2",    // user with origin + destination → expect 2
+            "ROLE_USER, 1, , 1",     // user with origin only → expect 1
+            "ROLE_USER, , 2, 1",     // user with destination only → expect 1
+            "ROLE_USER, , , 1"       // user with no filters → expect 1
+    })
+    void test_givenValidParameters_whenGetContainersForReport_thenReturnContainerList(
+            String role,
+            Long originId,
+            Long destinationId,
+            int expectedSize
+    ) {
+        List<Container> containers = new ArrayList<>();
+        for (int i = 0; i < expectedSize; i++) {
+            Container mockContainer = new Container();
+            mockContainer.setContainerId(i + 1);
+            mockContainer.setOrigin(manila);
+            mockContainer.setDestination(cebu);
+            containers.add(mockContainer);
+        }
 
-        when(containerRepository.findByOrigin(1L, startDate, endDate)).thenReturn(List.of(container, container2));
+        mockDependencies(containers, role, originId, destinationId);
 
-        List<ContainerDTO> containers = containerService.getContainersForReport(1L, startDate, endDate);
+        List<ContainerDTO> result = containerService.getContainersForReport(
+                originId, destinationId, startDate, endDate, "testUser", role
+        );
 
-        assertNotNull(containers);
-        assertEquals(2, containers.size());
-        verify(containerRepository, times(1)).findByOrigin(1L, startDate, endDate);
+        assertNotNull(result);
+        assertEquals(expectedSize, result.size());
+        result.forEach(dto -> {
+            assertEquals(1L, dto.getOrigin());
+            assertEquals(2L, dto.getDestination());
+        });
     }
 
-    @Test
-    void test_givenValidDateRangeNoContainer_whenGetContainersForReport_thenReturnEmptyList() {
-        LocalDateTime startDate = LocalDateTime.now();
-        LocalDateTime endDate = LocalDateTime.now();
+    private void mockDependencies(List<Container> containers, String role, Long originId, Long destinationId) {
+        boolean isAdmin = "ROLE_ADMIN".equals(role);
 
-        when(containerRepository.findByOrigin(3L, startDate, endDate)).thenReturn(Collections.emptyList());
-
-        List<ContainerDTO> containers = containerService.getContainersForReport(3L, startDate, endDate);
-
-        assertNotNull(containers);
-        verify(containerRepository, times(1)).findByOrigin(3L, startDate, endDate);
+        if (originId != null && destinationId != null) {
+            if (isAdmin) {
+                when(containerRepository.findByOriginAndDestination(anyLong(), anyLong(), eq(startDate), eq(endDate)))
+                        .thenReturn(containers);
+            } else {
+                when(containerRepository.findByOriginAndDestinationForUser(anyString(), anyLong(), anyLong(), eq(startDate), eq(endDate)))
+                        .thenReturn(containers);
+            }
+        } else if (originId != null) {
+            if (isAdmin) {
+                when(containerRepository.findByOrigin(anyLong(), eq(startDate), eq(endDate)))
+                        .thenReturn(containers);
+            } else {
+                when(containerRepository.findByOriginForUser(anyString(), anyLong(), eq(startDate), eq(endDate)))
+                        .thenReturn(containers);
+            }
+        } else if (destinationId != null) {
+            if (isAdmin) {
+                when(containerRepository.findByDestination(anyLong(), eq(startDate), eq(endDate)))
+                        .thenReturn(containers);
+            } else {
+                when(containerRepository.findByDestinationForUser(anyString(), anyLong(), eq(startDate), eq(endDate)))
+                        .thenReturn(containers);
+            }
+        } else {
+            if (isAdmin) {
+                when(containerRepository.findByDateRange(eq(startDate), eq(endDate)))
+                        .thenReturn(containers);
+            } else {
+                when(containerRepository.findByDateRangeForUser(anyString(), eq(startDate), eq(endDate)))
+                        .thenReturn(containers);
+            }
+        }
     }
 
     @Test
     void test_givenInvalidDateRange_whenGetContainersForReport_thenReturnEmptyList() {
-        LocalDateTime startDate = null;
-        LocalDateTime endDate = null;
+        LocalDateTime invalidStart = LocalDateTime.of(2024, 2, 1, 0, 0);
+        LocalDateTime invalidEnd = LocalDateTime.of(2024, 1, 1, 0, 0);
 
-        List<ContainerDTO> containers = containerService.getContainersForReport(null, startDate, endDate);
+        List<ContainerDTO> result = containerService.getContainersForReport(100L, 200L, invalidStart, invalidEnd, "testUser", "ROLE_ADMIN");
 
-        assertTrue(containers.isEmpty());
-        verify(containerRepository, never()).findByOrigin(4L, startDate, endDate);
+        assertTrue(result.isEmpty());
+        verifyNoInteractions(containerRepository);
+    }
+
+    @Test
+    void test_givenNullLocationIds_whenGetContainersForReport_thenReturnAllContainersInDateRange() {
+        when(containerRepository.findByDateRange(startDate, endDate)).thenReturn(Collections.emptyList());
+
+        List<ContainerDTO> result = containerService.getContainersForReport(null, null, startDate, endDate, "testUser", "ROLE_ADMIN");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
 }

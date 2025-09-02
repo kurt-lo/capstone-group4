@@ -36,11 +36,21 @@ public class ContainerService {
 
     public List<ContainerDTO> getAllContainers(String username, String role) {
         if ("ROLE_ADMIN".equals(role)) {
-            return containerRepository.findAll().stream()
+            List<Container> allContainers = containerRepository.findAll();
+            if (allContainers.isEmpty()) {
+                log.error("No containers found in the database");
+                throw new ContainerNotFoundException("No containers found");
+            }
+            return allContainers.stream()
                     .map(ContainerDTOMapper::mapContainerDTO)
                     .toList();
         } else {
-            return containerRepository.findByCreatedBy(username).stream()
+            List<Container> userContainers = containerRepository.findByCreatedBy(username);
+            if (userContainers.isEmpty()) {
+                log.error("No containers found for user: {}", username);
+                throw new ContainerNotFoundException("No containers found for user: " + username);
+            }
+            return userContainers.stream()
                     .map(ContainerDTOMapper::mapContainerDTO)
                     .toList();
         }
@@ -61,7 +71,6 @@ public class ContainerService {
         List<Container> container;
 
         if ("ROLE_ADMIN".equals(role)) {
-
             if (originId != null && destinationId != null) {
                  container = containerRepository.findByOriginAndDestination(originId, destinationId, startDate, endDate);
                 return container.stream()
@@ -139,13 +148,6 @@ public class ContainerService {
 
     private static boolean isInvalidDate(LocalDateTime startDate, LocalDateTime endDate) {
         return startDate == null || endDate == null || endDate.isBefore(startDate) || startDate.isAfter(endDate);
-    }
-
-    public List<Container> search(
-            Long originId,
-            Long destinationId
-    ) {
-        return containerRepository.searchContainer(originId, destinationId);
     }
 
 }
