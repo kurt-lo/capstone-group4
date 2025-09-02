@@ -29,6 +29,7 @@ function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [trackingEvent, setTrackingEvent] = useState([]);
+  const [city, setCity] = useState([]);
 
   const token = useAuthStore((state) => state.user?.token);
 
@@ -202,8 +203,29 @@ function Dashboard() {
     }
   };
 
-  // Fetch containers
+  //fetch cities
+  const fetchCities = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      const fetchCities = await axios.get("http://localhost:9090/api/city", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = fetchCities.data;
+      setCity(data);
+    } catch (e) {
+      console.error("Failed to fetch cities:", e);
+      setError("Failed to load cities. Please check the backend.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch cities and containers
   useEffect(() => {
+    fetchCities();
     fetchContainers();
   }, []);
 
@@ -238,17 +260,17 @@ function Dashboard() {
   if (error) return <div style={{ color: "crimson" }}>{error}</div>;
 
   return (
-    <div className="flex bg-gray-900 min-h-screen ">
+    <div className="flex bg-gray-900 min-h-screen">
       <Sidebar />
       {/* Layout Wrapper to allow squeezing */}
       <div className="flex flex-1 h-screen items-center justify-center px-[2rem]">
-        <div className="flex flex-col gap-6 w-full">
+        <div className="flex flex-col gap-6 w-full pt-[90%] md:pt-[20%] lg:pt-[5%]">
           <motion.div
             layout
             className={`flex-1 flex flex-col gap-6 transition-all duration-500 `}
           >
             {/* Top Stats */}
-            <div className="grid grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-3">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="bg-gradient-to-br from-cyan-500 to-blue-500 p-6 rounded-2xl shadow-lg"
@@ -272,7 +294,7 @@ function Dashboard() {
               </motion.div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
               {/* PIE CHART */}
               <div className="rounded-2xl border border-purple-500/40 shadow-lg shadow-purple-500/20 bg-white/5 backdrop-blur-md p-6">
                 <h2 className="text-lg font-semibold mb-4 text-white">
@@ -374,7 +396,7 @@ function Dashboard() {
               className="flex-1 p-5 rounded-2xl border-1 bg-gray-700/30 border-cyan-700 shadow-[0_0_20px_2px_rgba(34,211,238,0.8)] overflow-x-auto"
             >
               {/* Title + Button Row */}
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-4 min-w-full">
                 <h1 className="text-2xl font-bold text-white">My Containers</h1>
                 <button
                   onClick={() => setIsModalOpen(true)}
@@ -422,7 +444,7 @@ function Dashboard() {
                         Arrival Date
                       </th>
                       <th className="border-b border-blue-gray-100 p-5">
-                        Actions
+                        {/* Actions */}
                       </th>
                     </tr>
                   </thead>
@@ -581,11 +603,11 @@ function Dashboard() {
                   { label: "Type", value: selectedContainer.containerType },
                   {
                     label: "Origin",
-                    value: `${selectedContainer.origin_city}, ${selectedContainer.origin_country}`,
+                    value: `${selectedContainer.originCity}, ${selectedContainer.originCountry}`,
                   },
                   {
                     label: "Destination",
-                    value: `${selectedContainer.destination_city}, ${selectedContainer.destination_country}`,
+                    value: `${selectedContainer.destinationCity}, ${selectedContainer.destinationCountry}`,
                   },
                   { label: "Weight", value: selectedContainer.weight },
                   { label: "Size", value: selectedContainer.containerSize },
@@ -654,31 +676,49 @@ function Dashboard() {
                       name="containerType"
                       value={formData.containerType}
                       onChange={handleChange}
-                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      className="w-full p-2 rounded bg-gray-900 border border-gray-700 focus:border-cyan-400"
                       required
                     />
                   </div>
                   <div>
                     <label className="block text-sm mb-2">Origin</label>
-                    <input
-                      type="text"
+                    <select
                       name="origin"
                       value={formData.origin}
                       onChange={handleChange}
-                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
-                      required
-                    />
+                      className="bg-gray-900 w-full text-white border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select Origin City</option>
+                      {city.map((c) => (
+                        <option
+                          key={c.id}
+                          value={c.id}
+                          className="bg-gray-900 text-white"
+                        >
+                          {c.cityName}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm mb-2">Destination</label>
-                    <input
-                      type="text"
+                    <select
                       name="destination"
                       value={formData.destination}
                       onChange={handleChange}
-                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
-                      required
-                    />
+                      className="bg-gray-900 w-full text-white border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select Destination City</option>
+                      {city.map((c) => (
+                        <option
+                          key={c.id}
+                          value={c.id}
+                          className="bg-gray-900 text-white"
+                        >
+                          {c.cityName}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm mb-2">Weight</label>
@@ -687,7 +727,7 @@ function Dashboard() {
                       name="weight"
                       value={formData.weight}
                       onChange={handleChange}
-                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      className="w-full p-2 rounded bg-gray-900 border border-gray-700 focus:border-cyan-400"
                       required
                     />
                   </div>
@@ -698,7 +738,7 @@ function Dashboard() {
                       name="containerSize"
                       value={formData.containerSize}
                       onChange={handleChange}
-                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      className="w-full p-2 rounded bg-gray-900 border border-gray-700 focus:border-cyan-400"
                       required
                     />
                   </div>
@@ -709,7 +749,7 @@ function Dashboard() {
                       name="departureDate"
                       value={formData.departureDate}
                       onChange={handleChange}
-                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      className="w-full p-2 rounded bg-gray-900 border border-gray-700 focus:border-cyan-400"
                       required
                     />
                   </div>
@@ -720,7 +760,7 @@ function Dashboard() {
                       name="arrivalDate"
                       value={formData.arrivalDate}
                       onChange={handleChange}
-                      className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:border-cyan-400"
+                      className="w-full p-2 rounded bg-gray-900 border border-gray-700 focus:border-cyan-400"
                       required
                     />
                   </div>

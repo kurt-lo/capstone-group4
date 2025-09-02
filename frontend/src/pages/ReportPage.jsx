@@ -31,6 +31,7 @@ export default function ReportPage() {
   });
 
   const [data, setData] = useState([]);
+  const [city, setCity] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
@@ -39,6 +40,7 @@ export default function ReportPage() {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Fetch report data
   const fetchData = async () => {
     setLoading(true);
     setErr("");
@@ -69,7 +71,7 @@ export default function ReportPage() {
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(url); // will show single-encoded query: ...startDate=2025-08-30T18%3A52%3A00.000
+      console.log(url);
       console.log(res.data);
       setData(res.data || []);
     } catch (e) {
@@ -78,6 +80,31 @@ export default function ReportPage() {
       setLoading(false);
     }
   };
+
+  //fetch cities
+  const fetchCities = async () => {
+    try {
+      setErr(null);
+      setLoading(true);
+
+      const fetchCities = await axios.get("http://localhost:9090/api/city", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = fetchCities.data;
+      setCity(data);
+    } catch (e) {
+      console.error("Failed to fetch cities:", e);
+      setErr("Failed to load cities. Please check the backend.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch cities
+  useEffect(() => {
+    fetchCities();
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -187,12 +214,9 @@ export default function ReportPage() {
   };
 
   const formatDateISOZ = (s) => {
-    // Backend returns "YYYY-MM-DDTHH:mm:ss[.SSS]" without timezone.
-    // Converting to Date will treat it as local time and toISOString() adds "Z".
-    // If you prefer raw server string, just: return s ?? "-";
     if (!s) return "-";
     const d = new Date(s);
-    return d.toISOString(); // e.g., 2025-09-01T18:35:00.000Z
+    return d.toISOString();
   };
 
   return (
@@ -205,26 +229,44 @@ export default function ReportPage() {
       >
         <div>
           <label className="block text-sm mb-1">Origin ID</label>
-          <input
+          <select
             name="originId"
             value={filters.originId}
             onChange={handleChange}
-            type="number"
-            placeholder="e.g. 101"
-            className="w-full border rounded px-3 py-2"
-          />
+            className="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Origin City</option>
+            {city.map((c) => (
+              <option
+                key={c.id}
+                value={c.id}
+                className="bg-gray-900 text-white"
+              >
+                {c.cityName}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
           <label className="block text-sm mb-1">Destination ID</label>
-          <input
+          <select
             name="destinationId"
             value={filters.destinationId}
             onChange={handleChange}
-            type="number"
-            placeholder="optional"
-            className="w-full border rounded px-3 py-2"
-          />
+            className="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Destination City</option>
+            {city.map((c) => (
+              <option
+                key={c.id}
+                value={c.id}
+                className="bg-gray-900 text-white"
+              >
+                {c.cityName}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -234,7 +276,7 @@ export default function ReportPage() {
             value={filters.startDate}
             onChange={handleChange}
             type="datetime-local"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border rounded px-3 py-2 bg-gray-900 border-gray-700"
           />
         </div>
 
@@ -245,21 +287,14 @@ export default function ReportPage() {
             value={filters.endDate}
             onChange={handleChange}
             type="datetime-local"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border rounded px-3 py-2 bg-gray-900 border-gray-700"
           />
         </div>
 
-        <div className="md:col-span-2 flex gap-2">
-          <button
-            type="submit"
-            className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
-            disabled={loading}
-          >
-            {loading ? "Searching..." : "Search"}
-          </button>
+        <div className="md:col-span-2 flex flex-row-reverse gap-2">
           <button
             type="button"
-            className="px-4 py-2 rounded border"
+            className="px-4 py-2 rounded border btn btn-default cursor-pointer"
             onClick={() => {
               setFilters({
                 originId: "",
@@ -273,6 +308,13 @@ export default function ReportPage() {
           >
             Clear
           </button>
+          <button
+            type="submit"
+            className="px-4 py-2 rounded btn btn-primary"
+            disabled={loading}
+          >
+            {loading ? "Searching..." : "Search"}
+          </button>
         </div>
       </form>
 
@@ -280,7 +322,7 @@ export default function ReportPage() {
       <button
         type="button"
         onClick={handleExportPDF}
-        className="px-4 py-2 rounded border"
+        className="px-4 py-2 rounded border btn btn-outline cursor-pointer"
         disabled={!data?.length}
       >
         Export PDF
@@ -322,11 +364,10 @@ export default function ReportPage() {
                     <tr>
                       <th>Container ID</th>
                       <th>Type</th>
-                      <th>Status</th>
+                      {/* <th>Status</th> */}
                       <th>Origin</th>
                       <th>Destination</th>
                       <th>ETA</th>
-                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -336,11 +377,11 @@ export default function ReportPage() {
                           {row.containerId}
                         </td>
                         <td>{row.containerType}</td>
-                        <td>
+                        {/* <td>
                           <div className="badge badge-outline badge-primary">
                             {row.status || "Active"}
                           </div>
-                        </td>
+                        </td> */}
                         <td className="truncate max-w-[10rem]">
                           {row.originCity}, {row.originCountry}
                         </td>
@@ -348,9 +389,6 @@ export default function ReportPage() {
                           {row.destinationCity}, {row.destinationCountry}
                         </td>
                         <td>{row.arrivalDate?.replace("T", " ")}</td>
-                        <td>
-                          <button className="btn btn-xs">View</button>
-                        </td>
                       </tr>
                     ))}
                   </tbody>
