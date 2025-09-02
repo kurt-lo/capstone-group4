@@ -112,7 +112,7 @@ function LoginPage() {
         </form>
       </div>
 
-      <div className="hidden sm:block">
+      <div className="hidden md:block">
         <img
           className="w-full h-full object-cover"
           src={shipImg}

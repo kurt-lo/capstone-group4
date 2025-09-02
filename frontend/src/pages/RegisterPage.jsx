@@ -110,7 +110,7 @@ function RegisterPage() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 h-screen w-full">
-      <div className="hidden sm:block">
+      <div className="hidden md:block">
         <img
           className="w-full h-full object-cover"
           src={shipImg}
