@@ -263,14 +263,14 @@ function Dashboard() {
     <div className="flex bg-gray-900 min-h-screen">
       <Sidebar />
       {/* Layout Wrapper to allow squeezing */}
-      <div className="flex flex-1 h-screen items-center justify-center px-[2rem]">
-        <div className="flex flex-col gap-6 w-full pt-[90%] md:pt-[20%] lg:pt-[5%]">
+      <div className="flex flex-1 h-screen items-center justify-center px-1 lg:px-[2rem]">
+        <div className="flex flex-col gap-6 pt-[90%] md:pt-[20%] lg:pt-[5%]">
           <motion.div
             layout
             className={`flex-1 flex flex-col gap-6 transition-all duration-500 `}
           >
             {/* Top Stats */}
-            <div className="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-3">
+            <div className="grid grid-cols-3 grid-rows-1 gap-6 mb-8">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="bg-gradient-to-br from-cyan-500 to-blue-500 p-6 rounded-2xl shadow-lg"

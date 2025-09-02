@@ -11,7 +11,7 @@ import ReportPage from "./pages/ReportPage.jsx";
 
 function App() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen min-w-full w-full">
       <Navbar />
 
       <Routes>
