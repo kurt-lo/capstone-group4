@@ -99,7 +99,7 @@ const Containers = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* New Container Form Section */}
-          <div className="md:col-span-1 bg-white p-6 rounded-3xl shadow-2xl border-2 border-blue-200">
+          <div className="flex md:col-span-1 bg-white p-6 rounded-3xl shadow-2xl border-2 border-blue-200">
             <h2 className="flex items-center space-x-2 text-2xl font-bold text-blue-700 mb-6">
               <PlusCircle size={24} />
               <span>Add New Container</span>
